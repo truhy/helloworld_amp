@@ -212,7 +212,6 @@ void _socfpga_main(void) __attribute__((unused, alias("reset_handler")));  // Al
 
 // This makes newlib setup only the system stack
 void _stack_init(void){
-	return;
 }
 
 // ===================
