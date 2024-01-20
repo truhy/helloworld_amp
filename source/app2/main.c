@@ -21,10 +21,10 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version : 20231201
-	Program : Hello, World! AMP for core 1
-	Target  : ARM Cortex-A9 HPS on the Intel Cyclone V SoC-FPGA
-	Type    : Bare-metal C
+	Version: 20231201
+	Program: Hello, World! AMP for core 1
+	Target : ARM Cortex-A9 HPS on the Intel Cyclone V SoC-FPGA
+	Type   : Bare-metal C
 
 	About
 	=====
