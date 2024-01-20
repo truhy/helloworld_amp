@@ -578,8 +578,10 @@ cleantemp_app:
 # Clean root folder
 cleantemp: cleantemp_ub cleantemp_sd cleantemp_app
 	@if [ -d "$(BM_OUT_PATH)" ]; then \
-		if [ -f "$(DBG_UBOOT_SCRTXT)" ]; then echo rm -f $(DBG_UBOOT_SCRTXT) $(DBG_UBOOT_SCR); rm -f $(DBG_UBOOT_SCRTXT) $(DBG_UBOOT_SCR); fi; \
-		if [ -f "$(REL_UBOOT_SCRTXT)" ]; then echo rm -f $(REL_UBOOT_SCRTXT) $(REL_UBOOT_SCR); rm -f $(REL_UBOOT_SCRTXT) $(REL_UBOOT_SCR); fi; \
+		if [ -f "$(DBG_UBOOT_SCRTXT)" ]; then echo rm -f $(DBG_UBOOT_SCRTXT); rm -f $(DBG_UBOOT_SCRTXT); fi; \
+		if [ -f "$(DBG_UBOOT_SCR)" ]; then echo rm -f $(DBG_UBOOT_SCR); rm -f $(DBG_UBOOT_SCR); fi; \
+		if [ -f "$(REL_UBOOT_SCRTXT)" ]; then echo rm -f $(REL_UBOOT_SCRTXT); rm -f $(REL_UBOOT_SCRTXT); fi; \
+		if [ -f "$(REL_UBOOT_SCR)" ]; then echo rm -f $(REL_UBOOT_SCR); rm -f $(REL_UBOOT_SCR); fi; \
 	fi
 
 # ===========
