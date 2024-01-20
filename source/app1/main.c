@@ -185,12 +185,12 @@ int main(int argc, char **argv){
 void __attribute__((naked)) etu(int rc){
 	__asm__(
 		// Restore system stack pointer
-		"LDR r1, =uboot_sp     \n"
-		"LDR sp, [r1]          \n"
+		"LDR r3, =uboot_sp     \n"
+		"LDR sp, [r3]          \n"
 
 		// Restore return address
-		"LDR r1, =uboot_lr     \n"
-		"LDR lr, [r1]          \n"
+		"LDR r3, =uboot_lr     \n"
+		"LDR lr, [r3]          \n"
 
 		// Return to U-Boot
 		"BX lr                 \n"
