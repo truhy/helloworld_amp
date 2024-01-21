@@ -8,4 +8,5 @@ function cleanup {
 }
 trap cleanup EXIT
 
-./runelf.sh debug
+chmod +x runelf.sh
+runelf.sh debug
