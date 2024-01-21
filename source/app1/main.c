@@ -23,7 +23,7 @@
 
 	Version: 20231201
 	Program: Hello, World! AMP for core 0
-	Target : ARM Cortex-A9 HPS on the Intel Cyclone V SoC-FPGA
+	Target : ARM Cortex-A9 on the DE10-Nano development board (Intel Cyclone V SoC FPGA)
 	Type   : Bare-metal C
 
 	About

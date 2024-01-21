@@ -16,7 +16,7 @@
     <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.openocd.gdbServerExecutable" value="${openocd_path}/${openocd_executable}"/>
     <intAttribute key="ilg.gnumcueclipse.debug.gdbjtag.openocd.gdbServerGdbPortNumber" value="3333"/>
     <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.openocd.gdbServerLog" value=""/>
-    <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.openocd.gdbServerOther" value="-f interface/altera-usb-blaster2.cfg -f target/altera_fpgasoc_de.cfg -c &quot;init; halt; c5_reset; halt; c5_spl startup/u-boot-spl-nocache; sleep 200; halt; mww 0x0 0xe1200070; c5_core1&quot;"/>
+    <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.openocd.gdbServerOther" value="-f interface/altera-usb-blaster2.cfg -f target/altera_fpgasoc_de.cfg -c &quot;init; halt; c5_reset; halt; c5_spl startup/u-boot-spl-nocache; sleep 200; halt; mww 0x0 0xe1200070; c5_core1; arm core_state arm; load_image ../app1/Debug/app1.elf; resume 0x4000000; sleep 1000; halt&quot;"/>
     <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.openocd.gdbServerTclPortNumber" value="6666"/>
     <intAttribute key="ilg.gnumcueclipse.debug.gdbjtag.openocd.gdbServerTelnetPortNumber" value="4444"/>
     <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.openocd.otherInitCommands" value=""/>
