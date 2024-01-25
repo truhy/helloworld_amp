@@ -207,7 +207,7 @@ void __attribute__((naked)) reset_handler(void){
 
 #if(SMP_COHERENCY_ENABLE)
 	__asm__ volatile(
-		// Enable SMP cache coherency support, i.e. enables MMU TLB cache broadcast for multi-processors
+		// Enable SMP cache coherency support
 		"MRC p15, 0, r0, c1, c0, 1                     \n"  // Read ACTLR
 		"ORR r0, r0, #(0x1 << 6)                       \n"  // Set bit 6 to participate in SMP coherency
 		"ORR r0, r0, #(0x1 << 0)                       \n"  // Set bit 0 to enable maintenance broadcast
