@@ -30,8 +30,9 @@
 #define CORTEX_A9_H
 
 // GCC inline assembly macros
-#define __WFE() __asm volatile ("wfe":::"memory")
-#define __SEV() __asm volatile ("sev")
+#define __wfe() __asm__ volatile("wfe":::"memory")
+#define __sev() __asm__ volatile("sev")
+#define __dmb() __asm__ volatile("dmb 0xF":::"memory");
 #define __write_dcisw(index)  __asm__ volatile("MCR p15, 0, %0, c7, c6, 2" : : "r" (index) : "memory")
 #define __write_dccsw(index)  __asm__ volatile("MCR p15, 0, %0, c7, c10, 2" : : "r" (index) : "memory")
 #define __write_csselr(level) __asm__ volatile("MCR p15, 2, %0, c0, c0, 0" : : "r" (level) : "memory")

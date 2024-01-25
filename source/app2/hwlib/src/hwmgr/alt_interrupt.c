@@ -1239,6 +1239,9 @@ alt_int_cpu_target_t alt_int_util_cpu_current(void)
 #if ALT_INT_PROVISION_VECTOR_SUPPORT
 
 #if   defined(__ARMCOMPILER_VERSION)
+// Disable: warning: FP registers might be clobbered despite 'interrupt' attribute: compile with '-mgeneral-regs-only' [-Wattributes]
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wattributes"
 void __attribute__ ((interrupt)) alt_int_handler_irq(void)
 #elif defined(__ARMCC_VERSION)
 void __irq alt_int_handler_irq(void)
@@ -1257,6 +1260,9 @@ __asm__(".section .vectors, \"ax\";"
         "b __intc_isr_irq; "
 );
 
+// Disable: warning: FP registers might be clobbered despite 'interrupt' attribute: compile with '-mgeneral-regs-only' [-Wattributes]
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wattributes"
 void __attribute__ ((interrupt)) __intc_isr_irq(void)
 #endif
 
@@ -1287,3 +1293,9 @@ void alt_int_handler_irq(void)
 
     alt_write_word(alt_int_base_cpu + 0x10, icciar); /* icceoir */
 }
+#if   defined(__ARMCOMPILER_VERSION)
+#pragma GCC diagnostic pop
+#elif defined(__ARMCC_VERSION)
+#else
+#pragma GCC diagnostic pop
+#endif
