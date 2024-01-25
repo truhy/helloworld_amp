@@ -123,11 +123,39 @@ void __attribute__((naked)) reset_handler(void){
 	__asm__ volatile(
 		// Enable permission and turn on NEON/VFP (FPU)
 		"MRC p15, 0, r0, c1, c0, 2                     \n"  // Read CPACR (Coprocessor Access Control Register)
-		"ORR r0, r0, #(0xf << 20)                      \n"  // Setup bits to enable access to NEON/VFP (Coprocessors 10 and 11)
+		"ORR r0, r0, #0x00F00000                       \n"  // Setup bits to enable access to NEON/VFP (Coprocessors 10 and 11)
 		"MCR p15, 0, r0, c1, c0, 2                     \n"  // Write CPACR (Coprocessor Access Control Register)
 		"ISB                                           \n"  // Ensures CPACR write have completed before continuing
-		"MOV r0, #0x40000000                           \n"  // Setup bits to turn on the NEON/VFP (Advanced SIMD and floating-point extensions)
+
+		// Enable NEON
+		"VMRS r0, fpexc                                \n"  // Read FPEXC (Floating-Point Exception Control register)
+		"ORR r0, r0, #0x40000000                       \n"  // Setup bits to enable the NEON/VFP (Advanced SIMD and floating-point extensions)
 		"VMSR fpexc, r0                                \n"  // Write FPEXC (Floating-Point Exception Control register)
+
+		// Initialise VFP/NEON registers to 0
+		"MOV r0, #0                                    \n"
+		"VMOV d0, r0, r0                               \n"
+		"VMOV d1, r0, r0                               \n"
+		"VMOV d2, r0, r0                               \n"
+		"VMOV d3, r0, r0                               \n"
+		"VMOV d4, r0, r0                               \n"
+		"VMOV d5, r0, r0                               \n"
+		"VMOV d6, r0, r0                               \n"
+		"VMOV d7, r0, r0                               \n"
+		"VMOV d8, r0, r0                               \n"
+		"VMOV d9, r0, r0                               \n"
+		"VMOV d10, r0, r0                              \n"
+		"VMOV d11, r0, r0                              \n"
+		"VMOV d12, r0, r0                              \n"
+		"VMOV d13, r0, r0                              \n"
+		"VMOV d14, r0, r0                              \n"
+		"VMOV d15, r0, r0                              \n"
+
+		// Initialise FPSCR to a known state
+		"VMRS r0, fpscr                                \n"
+		"LDR r1, =0x00086060                           \n"
+		"AND r0, r0, r1                                \n"
+		"VMSR fpscr, r0                                \n"
 	);
 #endif
 
@@ -147,16 +175,6 @@ void __attribute__((naked)) reset_handler(void){
 
 #if(MMU_ENABLE)
 	mmu_init();                                             // Setup MMU table and enable MMU
-#endif
-
-#if(SMP_COHERENCY_ENABLE)
-	__asm__ volatile(
-		// Enable SMP cache coherency support, i.e. enables MMU TLB cache broadcast for multi-processors
-		"MRC p15, 0, r0, c1, c0, 1                     \n"  // Read ACTLR
-		"ORR r0, r0, #(0x1 << 6)                       \n"  // Set bit 6 to participate in SMP coherency
-		"ORR r0, r0, #(0x1 << 0)                       \n"  // Set bit 0 to enable maintenance broadcast
-		"MCR p15, 0, r0, c1, c0, 1                     \n"  // Write ACTLR
-	);
 #endif
 
 #if(L1_CACHE_ENABLE == 1)
@@ -186,6 +204,16 @@ void __attribute__((naked)) reset_handler(void){
 		"LDR r1, [r0, #0x0]                            \n"  // Read SCU register
 		"ORR r1, r1, #0x1                              \n"  // Set bit 0 (The Enable bit)
 		"STR r1, [r0, #0x0]                            \n"  // Write back modified value
+	);
+#endif
+
+#if(SMP_COHERENCY_ENABLE)
+	__asm__ volatile(
+		// Enable SMP cache coherency support
+		"MRC p15, 0, r0, c1, c0, 1                     \n"  // Read ACTLR
+		"ORR r0, r0, #(0x1 << 6)                       \n"  // Set bit 6 to participate in SMP coherency
+		"ORR r0, r0, #(0x1 << 0)                       \n"  // Set bit 0 to enable maintenance broadcast
+		"MCR p15, 0, r0, c1, c0, 1                     \n"  // Write ACTLR
 	);
 #endif
 
