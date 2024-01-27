@@ -81,7 +81,7 @@ SRCS := $(filter-out $(EXCLUDE_SRCS),$(SRCS))
 INCS := \
 	-I$(BM_SRC_PATH1) \
 	-I$(BM_SRC_PATH1)/startup/include \
-	-I$(BM_SRC_PATH1)/bsp_generated \
+	-I$(BM_SRC_PATH1)/bsp \
 	-I$(BM_SRC_PATH1)/hwlib/include \
 	-I$(BM_SRC_PATH1)/hwlib/include/soc_cv_av \
 	-I$(BM_SRC_PATH1)/util/include
@@ -93,19 +93,13 @@ LINKER_SCRIPT := $(BM_SRC_PATH1)/ldscript/tru_c5_ddr_core0.ld
 # Common linker and compiler build settings
 # =========================================
 
-ifeq ($(etu),1)
-CFLAGS := -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -mno-unaligned-access -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -std=gnu11 -DMMU_ENABLE=0 -DSMP_COHERENCY_ENABLE=0 -DL1_CACHE_ENABLE=2 -DL2_CACHE_ENABLE=2 -DSCU_ENABLE=0
-else
-CFLAGS := -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -mno-unaligned-access -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -std=gnu11
-endif
-
+CFLAGS := -mcpu=cortex-a9 -marm -mfloat-abi=hard -mfpu=neon -mno-unaligned-access -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -std=gnu11
 LDFLAGS := -Xlinker --gc-sections --specs=nosys.specs
 
 # Compiler user symbols (defines)
 CFLAGS_SYMBOL_HWLIB := -Dsoc_cv_av -DCYCLONEV
 CFLAGS_SYMBOL_DEBUG_SEMI := -DSEMIHOSTING
-CFLAGS_SYMBOL_DEBUG_UART := -DTRU_PRINTF_UART
-CFLAGS_SYMBOL_ETU := -DEXIT_TO_UBOOT
+CFLAGS_SYMBOL_ETU := -DTRU_EXIT_TO_UBOOT=1
 
 # ================================
 # Optimization and Debugging flags
@@ -123,8 +117,6 @@ DBG_CFLAGS := $(DBG_CFLAGS_OD) $(CFLAGS) -DDEBUG $(CFLAGS_SYMBOL_HWLIB)
 # Conditional debug compiler flags
 ifeq ($(semi),1)
 DBG_CFLAGS := $(DBG_CFLAGS) $(CFLAGS_SYMBOL_DEBUG_SEMI)
-else
-DBG_CFLAGS := $(DBG_CFLAGS) $(CFLAGS_SYMBOL_DEBUG_UART)
 endif
 # Conditional debug compiler flags
 ifeq ($(etu),1)
@@ -159,8 +151,6 @@ REL_CFLAGS := $(REL_CFLAGS_OD) $(CFLAGS) $(CFLAGS_SYMBOL_HWLIB)
 # Conditional release compiler flags
 ifeq ($(semi),1)
 REL_CFLAGS := $(REL_CFLAGS) $(CFLAGS_SYMBOL_DEBUG_SEMI)
-else
-REL_CFLAGS := $(REL_CFLAGS) $(CFLAGS_SYMBOL_DEBUG_UART)
 endif
 # Conditional release compiler flags
 ifeq ($(etu),1)

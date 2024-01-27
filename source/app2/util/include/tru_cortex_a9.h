@@ -21,16 +21,24 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20231201
+	Version: 20242701
 
-	Contains functions for some newlib stub functions to support the DE10-Nano
-	development board.
-
-	Contains mostly minimal implementation (fake return success or failure).
-	Added in debug print to HPS UART0.
+	Support for Cortex A9.
 */
 
-#ifndef NEWLIB_EXT_H
-#define NEWLIB_EXT_H
+#ifndef TRU_CORTEX_A9_H
+#define TRU_CORTEX_A9_H
+
+// GCC inline assembly macros
+#define __wfe() __asm__ volatile("wfe":::"memory")
+#define __sev() __asm__ volatile("sev")
+#define __dmb() __asm__ volatile("dmb 0xF":::"memory");
+#define __write_dcisw(index)  __asm__ volatile("MCR p15, 0, %0, c7, c6, 2" : : "r" (index) : "memory")
+#define __write_dccsw(index)  __asm__ volatile("MCR p15, 0, %0, c7, c10, 2" : : "r" (index) : "memory")
+#define __write_csselr(level) __asm__ volatile("MCR p15, 2, %0, c0, c0, 0" : : "r" (level) : "memory")
+#define __read_sctlr(result)  __asm__ volatile("MRC p15, 0, %0, c1, c0, 0" : "=r" (result) : : "memory")
+#define __read_ccsidr(result) __asm__ volatile("MRC p15, 1, %0, c0, c0, 0" : "=r" (result) : : "memory")
+#define __read_clidr(result)  __asm__ volatile("MRC p15, 1, %0, c0, c0, 1" : "=r" (result) : : "memory")
+#define __read_mpidr(mpidr)   __asm__ volatile("MRC p15, 0, %0, c0, c0, 5" : "=r" (mpidr) : : "memory")
 
 #endif

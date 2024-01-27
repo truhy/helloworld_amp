@@ -21,15 +21,16 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20231201
+	Version: 20242701
 */
+
+#include "tru_config.h"
+#if(TRU_PRINTF_UART)
+	#include "tru_c5_uart.h"
+#endif
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
-#include "newlib_ext.h"
-#ifdef TRU_PRINTF_UART
-	#include "c5_uart.h"
-#endif
 
 #ifndef SEMIHOSTING
 	int _close(int file){
@@ -76,7 +77,7 @@
 		Re-target depending on compiler define.
 	*/
 	int _write(int file, char *ptr, int len){
-		#ifdef TRU_PRINTF_UART
+		#if(TRU_PRINTF_UART)
 			// Re-target to UART controller
 
 			// Not stdout?
@@ -86,7 +87,7 @@
 				return -1;
 			}
 
-			c5_uart_write_str(C5_UART0_BASE_ADDR, ptr, len);
+			tru_c5_uart_write_str(TRU_C5_UART0_BASE_ADDR, ptr, len);
 
 			return len;
 		#else

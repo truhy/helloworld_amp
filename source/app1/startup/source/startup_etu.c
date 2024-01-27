@@ -21,18 +21,19 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240120
+	Version: 20242701
 */
 
-#ifdef EXIT_TO_UBOOT
+#include "tru_config.h"
 
-#include "startup_etu.h"
+#if(TRU_EXIT_TO_UBOOT)
+
 #include "alt_cache.h"
 #include "alt_mmu.h"
 #include "alt_interrupt.h"
 
 // Prototypes
-#if(MMU_ENABLE)
+#if(TRU_MMU_ENABLE == 1U)
 static void mmu_init(void);
 #endif
 
@@ -83,20 +84,20 @@ void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
 		// Setup stack for each exception mode
 		// Note: When you call HWLib's interrupt init function the stacks will be change to a global variable array, and this setup will be dropped
 		"CPS #0x11                                     \n"
-		"LDR sp, =_FIQ_STACK_LIMIT                     \n"
+		"LDR sp, =__FIQ_STACK_LIMIT                    \n"
 		"CPS #0x12                                     \n"
-		"LDR sp, =_IRQ_STACK_LIMIT                     \n"
+		"LDR sp, =__IRQ_STACK_LIMIT                    \n"
 		"CPS #0x13                                     \n"
-		"LDR sp, =_SVC_STACK_LIMIT                     \n"
+		"LDR sp, =__SVC_STACK_LIMIT                    \n"
 		"CPS #0x17                                     \n"
-		"LDR sp, =_ABT_STACK_LIMIT                     \n"
+		"LDR sp, =__ABT_STACK_LIMIT                    \n"
 		"CPS #0x1B                                     \n"
-		"LDR sp, =_UND_STACK_LIMIT                     \n"
+		"LDR sp, =__UND_STACK_LIMIT                    \n"
 		"CPS #0x1F                                     \n"
-		"LDR sp, =_SYS_STACK_LIMIT                     \n"
+		"LDR sp, =__SYS_STACK_LIMIT                    \n"
 	);
 
-#if(CLEAN_CACHE)
+#if(TRU_CLEAN_CACHE == 1U)
 	// Since we are starting from U-Boot which may have the cache enabled,
 	// loaded file(s) and some global variables may be cached and stay dirty.
 	// Let's make sure that all dirty lines are written back into memory, in
@@ -105,16 +106,35 @@ void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
 	alt_cache_l2_clean_all();
 #endif
 
-#if(L2_CACHE_ENABLE != 2)
-	// Disable L2 cache
+#if(TRU_SMP_COHERENCY_ENABLE != 2U)
+	__asm__ volatile(
+		// Disable SMP cache coherency support
+		"MRC p15, 0, r0, c1, c0, 1                     \n"  // Read ACTLR
+		"BIC r0, r0, #(0x1 << 6)                       \n"  // Clear bit 6 to participate in SMP coherency
+		"BIC r0, r0, #(0x1 << 0)                       \n"  // Clear bit 0 to enable maintenance broadcast
+		"MCR p15, 0, r0, c1, c0, 1                     \n"  // Write ACTLR
+	);
+#endif
+
+#if(TRU_SCU_ENABLE != 2U)
+	__asm__ volatile(
+		// Disable SCU
+		"LDR r0, =0xfffec000UL                         \n"  // Load SCU base register
+		"LDR r1, [r0, #0x0]                            \n"  // Read SCU register
+		"ORR r1, r1, #0x0                              \n"  // Clear bit 0 (The Enable bit)
+		"STR r1, [r0, #0x0]                            \n"  // Write back modified value
+	);
+#endif
+
+#if(TRU_L2_CACHE_ENABLE != 2U)
 	alt_cache_l2_disable();
 	alt_cache_l2_parity_disable();
 	alt_cache_l2_prefetch_disable();
 	alt_cache_l2_uninit();
 #endif
 
-#if(L1_CACHE_ENABLE != 2)
-	alt_cache_l1_disable_all();                             // Disable L1 cache
+#if(TRU_L1_CACHE_ENABLE != 2U)
+	alt_cache_l1_disable_all();
 #endif
 
 	__asm__ volatile(
@@ -125,7 +145,7 @@ void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
 		"ISB                                           \n"
 	);
 
-#if(NEON_ENABLE)
+#if(TRU_NEON_ENABLE == 1U)
 	__asm__ volatile(
 		// Enable permission and turn on NEON/VFP (FPU)
 		"MRC p15, 0, r0, c1, c0, 2                     \n"  // Read CPACR (Coprocessor Access Control Register)
@@ -165,27 +185,23 @@ void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
 	);
 #endif
 
-#if(MMU_ENABLE)
+#if(TRU_MMU_ENABLE == 1U)
 	mmu_init();                                             // Setup MMU table and enable MMU
 #endif
 
-#if(L1_CACHE_ENABLE == 1)
+#if(TRU_L1_CACHE_ENABLE == 1U)
 	alt_cache_l1_enable_all();                              // Enable and invalidate L1 cache
 #endif
 
-#if(L2_CACHE_ENABLE == 1)
+#if(TRU_L2_CACHE_ENABLE == 1U)
 	alt_cache_l2_init();
 	alt_cache_l2_prefetch_enable();
 	alt_cache_l2_parity_enable();
 	alt_cache_l2_enable();                                  // Enable and invalidate L2 cache
 #endif
 
-#if(SCU_ENABLE)
+#if(TRU_SCU_ENABLE == 1U)
 	__asm__ volatile(
-		// =======================================
-		// Initialise the SCU (Snoop Control Unit)
-		// =======================================
-
 		// Invalidate SCU
 		"LDR r0, =0xfffec000UL                         \n"  // Load SCU base register
 		"LDR r1, =0xffff                               \n"  // Value to write
@@ -199,11 +215,12 @@ void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
 	);
 #endif
 
-#if(SMP_COHERENCY_ENABLE)
+#if(TRU_SMP_COHERENCY_ENABLE == 1U)
 	__asm__ volatile(
 		// Enable SMP cache coherency support
 		"MRC p15, 0, r0, c1, c0, 1                     \n"  // Read ACTLR
 		"ORR r0, r0, #(0x1 << 6)                       \n"  // Set bit 6 to participate in SMP coherency
+		"ORR r0, r0, #(0x1 << 2)                       \n"  // Set bit 2 to enable L1 dside prefetch
 		"ORR r0, r0, #(0x1 << 0)                       \n"  // Set bit 0 to enable maintenance broadcast
 		"MCR p15, 0, r0, c1, c0, 1                     \n"  // Write ACTLR
 	);
@@ -225,7 +242,7 @@ void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
 // =======================
 
 // For exit to U-Boot we won't be using HWLib's vector, just setting this up to make it happy
-#if(ALT_INT_PROVISION_VECTOR_SUPPORT != 0)
+#if(ALT_INT_PROVISION_VECTOR_SUPPORT != 0U)
 void hwlib_reset_handler(void){
 	reset_handler(0, 0);
 }
@@ -245,7 +262,7 @@ void _stack_init(void){
 // ===================
 
 // *Note: Altera's MMU alt_mmu_va_space_create() function will create a huge local array!!  Ensure your stack space is greater than 4K = 4096 bytes!
-#if(MMU_ENABLE)
+#if(TRU_MMU_ENABLE == 1U)
 #define TTB_ATTRIB_ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 static long unsigned int __attribute__((__section__("MMU_TTB"))) mmu_ttb[4096];  // This array is the MMU table.  It is placed at the specified linker section, aligned to 16KB, defined in the linker file
 

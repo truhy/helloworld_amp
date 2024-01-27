@@ -21,24 +21,20 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20231230
+	Version: 20242701
 
-	Support for Cortex A9.
+	UART functions for Cyclone V SoC (HPS).
 */
 
-#ifndef CORTEX_A9_H
-#define CORTEX_A9_H
+#ifndef TRU_C5_UTIL_H
+#define TRU_C5_UTIL_H
 
-// GCC inline assembly macros
-#define __wfe() __asm__ volatile("wfe":::"memory")
-#define __sev() __asm__ volatile("sev")
-#define __dmb() __asm__ volatile("dmb 0xF":::"memory");
-#define __write_dcisw(index)  __asm__ volatile("MCR p15, 0, %0, c7, c6, 2" : : "r" (index) : "memory")
-#define __write_dccsw(index)  __asm__ volatile("MCR p15, 0, %0, c7, c10, 2" : : "r" (index) : "memory")
-#define __write_csselr(level) __asm__ volatile("MCR p15, 2, %0, c0, c0, 0" : : "r" (level) : "memory")
-#define __read_sctlr(result)  __asm__ volatile("MRC p15, 0, %0, c1, c0, 0" : "=r" (result) : : "memory")
-#define __read_ccsidr(result) __asm__ volatile("MRC p15, 1, %0, c0, c0, 0" : "=r" (result) : : "memory")
-#define __read_clidr(result)  __asm__ volatile("MRC p15, 1, %0, c0, c0, 1" : "=r" (result) : : "memory")
-#define __read_mpidr(mpidr)   __asm__ volatile("MRC p15, 0, %0, c0, c0, 5" : "=r" (mpidr) : : "memory")
+#include <stdint.h>
+
+// Support macros
+#define TRU_C5_REG_TYPE uint32_t
+#define TRU_C5_CAST(type, ptr) ((type)(ptr))
+#define tru_c5_io_rd_word(src_addr) (*TRU_C5_CAST(volatile TRU_C5_REG_TYPE *, (src_addr)))
+#define tru_c5_io_wr_word(dst_addr, src_addr) (*TRU_C5_CAST(volatile TRU_C5_REG_TYPE *, (dst_addr)) = (src_addr))
 
 #endif
