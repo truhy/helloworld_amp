@@ -29,6 +29,7 @@
 #ifndef TRU_LOGGER_H
 #define TRU_LOGGER_H
 
+#include "tru_config.h"
 #include <stdio.h>
 
 // Define a macro named _NL to select the correct line endings for different modes.  NL stands for NewLine
