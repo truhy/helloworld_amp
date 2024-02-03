@@ -44,9 +44,9 @@ void fiq_handler(void)   __attribute__((weak, alias("default_handler")));
 
 // Vector table, placed at specified linker section
 __asm__(
-".section vectors, \"ax\"                          \n"
-".global _vectbl                                   \n"
-"_vectbl:                                          \n"
+".section .vectors, \"ax\"                         \n"
+".global vectbl                                    \n"
+"vectbl:                                           \n"
 	"LDR pc, =reset_handler                        \n"
 	"LDR pc, =undef_handler                        \n"
 	"LDR pc, =svc_handler                          \n"
@@ -182,7 +182,7 @@ void __attribute__((naked)) reset_handler(void){
 #if(ALT_INT_PROVISION_VECTOR_SUPPORT == 0U)
 	__asm__ volatile(
 		// Set Vector Base Address Register (VBAR)
-		"LDR r0, =_vectbl                              \n"  // Register our vector table
+		"LDR r0, =vectbl                               \n"  // Register our vector table
 		"MCR p15, 0, r0, c12, c0, 0                    \n"
 	);
 #else
