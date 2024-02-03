@@ -10,12 +10,12 @@ __CORE1_RAM_SIZE    = 64M;
 __CORE1_WAITER_SIZE = 512;
 
 /* Ensure these stack sizes are aligned to 8 bytes */
-__SYS_STACK_SIZE = 8192;
-__UND_STACK_SIZE = 4096;
-__ABT_STACK_SIZE = 4096;
-__SVC_STACK_SIZE = 4096;
-__IRQ_STACK_SIZE = 4096;
 __FIQ_STACK_SIZE = 4096;
+__IRQ_STACK_SIZE = 4096;
+__SVC_STACK_SIZE = 4096;
+__ABT_STACK_SIZE = 4096;
+__UND_STACK_SIZE = 4096;
+__SYS_STACK_SIZE = 8192;  /* This is also for the user mode, because they use the same stack pointer */
 
 MEMORY {
     __CORE1_RAM (rwx) : ORIGIN = __CORE1_RAM_BASE, LENGTH = __CORE1_RAM_SIZE
@@ -36,7 +36,7 @@ SECTIONS {
     .vectors : {
         __vectors = .;
         
-        KEEP(*(.vectors))
+        *(.vectors)
         
         __evectors = .;
     } > __CORE1_RAM : _LOAD_RX
@@ -195,7 +195,7 @@ SECTIONS {
         __heap_start = .;  /* User defined symbol */
         
         *(.heap*)
-        . = ORIGIN(__CORE1_RAM) + LENGTH(__CORE1_RAM) - . - __SYS_STACK_SIZE - __UND_STACK_SIZE - __ABT_STACK_SIZE - __SVC_STACK_SIZE - __IRQ_STACK_SIZE - __FIQ_STACK_SIZE;  /* Calculate maximum heap size to move stack all the way to the end of RAM */
+        . = ORIGIN(__CORE1_RAM) + LENGTH(__CORE1_RAM) - . - __FIQ_STACK_SIZE - __IRQ_STACK_SIZE - __SVC_STACK_SIZE - __ABT_STACK_SIZE - __UND_STACK_SIZE - __SYS_STACK_SIZE;  /* Calculate maximum heap size to move stack all the way to the end of RAM */
         
         . = ALIGN(4);
         __heap_end = .;    /* User defined symbol */
@@ -205,29 +205,29 @@ SECTIONS {
     .stack (NOLOAD) : {
         . = ALIGN(8);
         
-        __SYS_STACK_BASE = .;
-        . += __SYS_STACK_SIZE;
-        __SYS_STACK_LIMIT = .;
-        
-        __UND_STACK_BASE = .;
-        . += __UND_STACK_SIZE;
-        __UND_STACK_LIMIT = .;
-        
-        __ABT_STACK_BASE = .;
-        . += __ABT_STACK_SIZE;
-        __ABT_STACK_LIMIT = .;
-        
-        __SVC_STACK_BASE = .;
-        . += __SVC_STACK_SIZE;
-        __SVC_STACK_LIMIT = .;
-        
-        __IRQ_STACK_BASE = .;
-        . += __IRQ_STACK_SIZE;
-        __IRQ_STACK_LIMIT = .;
-        
         __FIQ_STACK_BASE = .;
         . += __FIQ_STACK_SIZE;
         __FIQ_STACK_LIMIT = .;
+		
+		__IRQ_STACK_BASE = .;
+        . += __IRQ_STACK_SIZE;
+        __IRQ_STACK_LIMIT = .;
+		
+		__SVC_STACK_BASE = .;
+        . += __SVC_STACK_SIZE;
+        __SVC_STACK_LIMIT = .;
+		
+		__ABT_STACK_BASE = .;
+        . += __ABT_STACK_SIZE;
+        __ABT_STACK_LIMIT = .;
+		
+		__UND_STACK_BASE = .;
+        . += __UND_STACK_SIZE;
+        __UND_STACK_LIMIT = .;
+        
+		__SYS_STACK_BASE = .;
+        . += __SYS_STACK_SIZE;
+        __SYS_STACK_LIMIT = .;
         
         __stack = .;  /* Used by newlib */
         

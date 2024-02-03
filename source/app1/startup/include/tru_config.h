@@ -21,7 +21,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20242701
+	Version: 20240203
 
 	Common configuration
  */
@@ -52,6 +52,8 @@
 #endif
 
 #if(TRU_EXIT_TO_UBOOT)
+	#include "etu.h"
+
 	// We do not want cache in DEBUG mode
 	#ifdef DEBUG
 		#ifndef TRU_CLEAN_CACHE

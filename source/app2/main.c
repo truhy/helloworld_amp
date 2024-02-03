@@ -21,7 +21,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20242701
+	Version: 20240203
 	Program: Hello, World! AMP for core 1
 	Target : ARM Cortex-A9 on the DE10-Nano development board (Intel Cyclone V SoC FPGA)
 	Type   : Bare-metal C
@@ -58,6 +58,7 @@
 	captured.  This is same the opposite way.
 */
 
+#include "tru_config.h"
 #include "tru_cortex_a9.h"
 #include "tru_c5_uart.h"
 #include "tru_logger.h"

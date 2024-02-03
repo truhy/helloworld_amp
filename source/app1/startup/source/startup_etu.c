@@ -21,7 +21,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20242701
+	Version: 20240203
 */
 
 #include "tru_config.h"
@@ -36,19 +36,6 @@
 #if(TRU_MMU_ENABLE == 1U)
 static void mmu_init(void);
 #endif
-
-// ===============================================
-// Global variables for returning back into U-Boot
-// ===============================================
-
-// Initialised global variables for storing startup values to support U-Boot
-// Note, we want them inside the .data section so that our values set in the
-// reset handler will not be zeroed out.  Normally, they would be placed into
-// the .bss section as uninitialised variables, which would be zeroed filled.
-long unsigned int uboot_lr __attribute__((__section__(".data")));
-long unsigned int uboot_sp __attribute__((__section__(".data")));
-int uboot_argc             __attribute__((__section__(".data")));
-char **uboot_argv          __attribute__((__section__(".data")));
 
 // =============
 // Reset handler
@@ -73,13 +60,39 @@ void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
 		"LDR r3, =uboot_argv                           \n"
 		"STR r1, [r3]                                  \n"
 
-		// Save U-Boot system stack pointer
-		"LDR r3, =uboot_sp                             \n"
-		"STR sp, [r3]                                  \n"
-
 		// Save U-Boot return address
 		"LDR r3, =uboot_lr                             \n"
 		"STR lr, [r3]                                  \n"
+
+		// Save U-Boot processor mode
+		"LDR r3, =uboot_cpsr                           \n"
+		"MRS r2, cpsr                                  \n"
+		"STR r2, [r3]                                  \n"
+
+		// Save U-Boot stack pointer for each mode
+		"CPS #0x11                                     \n"
+		"LDR r3, =uboot_fiq_sp                         \n"
+		"STR sp, [r3]                                  \n"
+		"CPS #0x12                                     \n"
+		"LDR r3, =uboot_irq_sp                         \n"
+		"STR sp, [r3]                                  \n"
+		"CPS #0x13                                     \n"
+		"LDR r3, =uboot_svc_sp                         \n"
+		"STR sp, [r3]                                  \n"
+		"CPS #0x17                                     \n"
+		"LDR r3, =uboot_abt_sp                         \n"
+		"STR sp, [r3]                                  \n"
+		"CPS #0x1B                                     \n"
+		"LDR r3, =uboot_und_sp                         \n"
+		"STR sp, [r3]                                  \n"
+		"CPS #0x1F                                     \n"
+		"LDR r3, =uboot_sys_sp                         \n"
+		"STR sp, [r3]                                  \n"
+
+		// Save VBAR (vector base address)
+		"LDR r3, =uboot_vbar                           \n"
+		"MRC p15, 0, r2, c12, c0, 0                    \n"
+		"STR r2, [r3]                                  \n"
 
 		// Setup stack for each exception mode
 		// Note: When you call HWLib's interrupt init function the stacks will be change to a global variable array, and this setup will be dropped
