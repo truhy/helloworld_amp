@@ -23,7 +23,7 @@
 
 	Version: 20242701
 
-	UART functions for Cyclone V SoC (HPS).
+	Utility functions for Cyclone V SoC (HPS).
 */
 
 #ifndef TRU_C5_UTIL_H
