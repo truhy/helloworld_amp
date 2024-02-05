@@ -7,13 +7,13 @@
 :release
 @SET app1_elf=ReleaseApp1//%BM_PROGRAM_NAME1%.elf
 @SET app2_elf=ReleaseApp2//%BM_PROGRAM_NAME2%.elf
-@SET ubootspl=%BM_SRC_PATH1%//startup//u-boot-spl
+@SET ubootspl=%BM_SRC_PATH1%//bsp//u-boot-spl
 @GOTO find_elf_entry_point
 
 :debug
 @SET app1_elf=DebugApp1//%BM_PROGRAM_NAME1%.elf
 @SET app2_elf=DebugApp2//%BM_PROGRAM_NAME2%.elf
-@SET ubootspl=%BM_SRC_PATH1%//startup//u-boot-spl-nocache
+@SET ubootspl=%BM_SRC_PATH1%//bsp//u-boot-spl-nocache
 @GOTO find_elf_entry_point
 
 :find_elf_entry_point

@@ -18,10 +18,10 @@ cd $BM_HOME_PATH
 # Determine build from input argument
 if [ $1 = "debug" ]; then
 	app1_elf="Debug/$BM_PROGRAM_NAME1".elf
-	ubootspl="$BM_SRC_PATH1/startup/u-boot-spl-nocache"
+	ubootspl="$BM_SRC_PATH1/bsp/u-boot-spl-nocache"
 else
 	app1_elf="Release/$BM_PROGRAM_NAME1".elf
-	ubootspl="$BM_SRC_PATH1/startup/u-boot-spl"
+	ubootspl="$BM_SRC_PATH1/bsp/u-boot-spl"
 fi
 
 # Find elf entry point
