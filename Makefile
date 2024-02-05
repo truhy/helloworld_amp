@@ -613,11 +613,11 @@ endif
 
 dbg_make_elf:
 	make -f Makefile-app1.mk --no-print-directory debug semi=$(semi) etu=$(etu) bin=$(bin) uimg=$(uimg)
-	make -f Makefile-app2.mk --no-print-directory debug semi=$(semi) etu=$(etu) bin=$(bin) uimg=$(uimg)
+	make -f Makefile-app2.mk --no-print-directory debug semi=$(semi) etu=0 bin=$(bin) uimg=$(uimg)
 
 rel_make_elf:
 	make -f Makefile-app1.mk --no-print-directory release semi=$(semi) etu=$(etu) bin=$(bin) uimg=$(uimg)
-	make -f Makefile-app2.mk --no-print-directory release semi=$(semi) etu=$(etu) bin=$(bin) uimg=$(uimg)
+	make -f Makefile-app2.mk --no-print-directory release semi=$(semi) etu=0 bin=$(bin) uimg=$(uimg)
 
 # ========================
 # Read ELF load text file

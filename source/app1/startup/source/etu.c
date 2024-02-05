@@ -21,35 +21,36 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240203
+	Version: 20240205
 
 	Exit to U-Boot support.
 */
 
 #include "etu.h"
-#include "tru_logger.h"
 
 #if(TRU_EXIT_TO_UBOOT)
-	// ===============================================
-	// Global variables for returning back into U-Boot
-	// ===============================================
 
-	// Initialised global variables for storing startup values to support U-Boot
-	// Note, we want them inside the .data section so that our values set in the
-	// reset handler will not be zeroed out.  Normally, they would be placed into
-	// the .bss section as uninitialised variables, which would be zeroed filled.
-	int uboot_argc                 __attribute__((__section__(".data")));
-	char **uboot_argv              __attribute__((__section__(".data")));
-	long unsigned int uboot_lr     __attribute__((__section__(".data")));
-	long unsigned int uboot_cpsr   __attribute__((__section__(".data")));
-	long unsigned int uboot_sys_sp __attribute__((__section__(".data")));  // This is also for the user mode, because they use the same stack pointer
-	long unsigned int uboot_und_sp __attribute__((__section__(".data")));
-	long unsigned int uboot_abt_sp __attribute__((__section__(".data")));
-	long unsigned int uboot_svc_sp __attribute__((__section__(".data")));
-	long unsigned int uboot_irq_sp __attribute__((__section__(".data")));
-	long unsigned int uboot_fiq_sp __attribute__((__section__(".data")));
-	long unsigned int uboot_vbar   __attribute__((__section__(".data")));
-#endif
+#include "tru_logger.h"
+
+// ===============================================
+// Global variables for returning back into U-Boot
+// ===============================================
+
+// Initialised global variables for storing startup values to support U-Boot
+// Note, we want them inside the .data section so that our values set in the
+// reset handler will not be zeroed out.  Normally, they would be placed into
+// the .bss section as uninitialised variables, which would be zeroed filled.
+int uboot_argc                 __attribute__((__section__(".data")));
+char **uboot_argv              __attribute__((__section__(".data")));
+long unsigned int uboot_lr     __attribute__((__section__(".data")));
+long unsigned int uboot_cpsr   __attribute__((__section__(".data")));
+long unsigned int uboot_sys_sp __attribute__((__section__(".data")));  // This is also for the user mode, because they use the same stack pointer
+long unsigned int uboot_und_sp __attribute__((__section__(".data")));
+long unsigned int uboot_abt_sp __attribute__((__section__(".data")));
+long unsigned int uboot_svc_sp __attribute__((__section__(".data")));
+long unsigned int uboot_irq_sp __attribute__((__section__(".data")));
+long unsigned int uboot_fiq_sp __attribute__((__section__(".data")));
+long unsigned int uboot_vbar   __attribute__((__section__(".data")));
 
 // Exit to U-Boot
 void __attribute__((naked)) etu(int rc){
@@ -106,3 +107,5 @@ void __attribute__((noreturn)) _exit(int status){
 	DEBUG_PRINTF("DEBUG: Starting infinity loop"_NL);
 	while(1);
 }
+
+#endif

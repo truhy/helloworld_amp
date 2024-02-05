@@ -21,7 +21,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240203
+	Version: 20240205
 
 	Exit to U-Boot support.
 */
@@ -30,17 +30,19 @@
 #define ETU_H
 
 #if(TRU_EXIT_TO_UBOOT)
-	extern int uboot_argc;
-	extern char **uboot_argv;
-	extern long unsigned int uboot_lr;
-	extern long unsigned int uboot_cpsr;
-	extern long unsigned int uboot_sys_sp;  // This is also for the user mode, because they use the same stack pointer
-	extern long unsigned int uboot_und_sp;
-	extern long unsigned int uboot_abt_sp;
-	extern long unsigned int uboot_svc_sp;
-	extern long unsigned int uboot_irq_sp;
-	extern long unsigned int uboot_fiq_sp;
-	extern long unsigned int uboot_vbar;
+
+extern int uboot_argc;
+extern char **uboot_argv;
+extern long unsigned int uboot_lr;
+extern long unsigned int uboot_cpsr;
+extern long unsigned int uboot_sys_sp;  // This is also for the user mode, because they use the same stack pointer
+extern long unsigned int uboot_und_sp;
+extern long unsigned int uboot_abt_sp;
+extern long unsigned int uboot_svc_sp;
+extern long unsigned int uboot_irq_sp;
+extern long unsigned int uboot_fiq_sp;
+extern long unsigned int uboot_vbar;
+
 #endif
 
 #endif

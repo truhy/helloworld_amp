@@ -21,7 +21,14 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20242701
+	Version: 20240205
+
+	Bare-metal C startup initialisations for the Intel Cyclone V SoC (HPS), ARM Cortex-A9.
+	Mostly using HWLib.
+
+	References:
+		- Cyclone V SoC: Cyclone V Hard Processor System Technical Reference Manual
+		- MMU          : ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition. Notable refs: B3.5.1 Short-descriptor translation table format descriptors
 */
 
 #include "tru_config.h"
@@ -32,40 +39,44 @@
 #include "alt_mmu.h"
 #include "alt_interrupt.h"
 
-#if(ALT_INT_PROVISION_VECTOR_SUPPORT == 0)
-// Exception & interrupt handler prototypes for core 0
-void default_handler(void);
-void undef_handler(void) __attribute__((weak, alias("default_handler")));
-void svc_handler(void)   __attribute__((weak, alias("default_handler")));
-void pabt_handler(void)  __attribute__((weak, alias("default_handler")));
-void dabt_handler(void)  __attribute__((weak, alias("default_handler")));
-void irq_handler(void)   __attribute__((weak, alias("default_handler")));
-void fiq_handler(void)   __attribute__((weak, alias("default_handler")));
+#if(ALT_INT_PROVISION_VECTOR_SUPPORT == 0U)
+	// Exception & interrupt handler prototypes for core 0
+	void default_handler(void);
+	void undef_handler(void) __attribute__((weak, alias("default_handler")));
+	void svc_handler(void)   __attribute__((weak, alias("default_handler")));
+	void pabt_handler(void)  __attribute__((weak, alias("default_handler")));
+	void dabt_handler(void)  __attribute__((weak, alias("default_handler")));
+	void irq_handler(void)   __attribute__((weak, alias("default_handler")));
+	void fiq_handler(void)   __attribute__((weak, alias("default_handler")));
 
-// Vector table, placed at specified linker section
-__asm__(
-".section .vectors, \"ax\"                         \n"
-".global vectbl                                    \n"
-"vectbl:                                           \n"
-	"LDR pc, =reset_handler                        \n"
-	"LDR pc, =undef_handler                        \n"
-	"LDR pc, =svc_handler                          \n"
-	"LDR pc, =pabt_handler                         \n"
-	"LDR pc, =dabt_handler                         \n"
-	"NOP                                           \n"
-	"LDR pc, =irq_handler                          \n"
-	"LDR pc, =fiq_handler                          \n"
-);
+	// Vector table, placed at specified linker section
+	__asm__(
+		".section .vectors, \"ax\"                         \n"
+		".global vectbl                                    \n"
+		"vectbl:                                           \n"
+			"LDR pc, =reset_handler                        \n"
+			"LDR pc, =undef_handler                        \n"
+			"LDR pc, =svc_handler                          \n"
+			"LDR pc, =pabt_handler                         \n"
+			"LDR pc, =dabt_handler                         \n"
+			"NOP                                           \n"
+			"LDR pc, =irq_handler                          \n"
+			"LDR pc, =fiq_handler                          \n"
+	);
 
-// Unhandled interrupt handler
-void default_handler(void){
-	while(1);
-}
+	// Unhandled interrupt handler
+	void default_handler(void){
+		while(1);
+	}
 #endif
 
-#if(TRU_MMU_ENABLE)
-static void mmu_init(void);
+#if(TRU_MMU_ENABLE == 1U)
+	static void mmu_init(void);
 #endif
+
+// =============
+// Reset handler
+// =============
 
 // Notes:
 // - Newlib will initialise the .bss section for us so no need to do it here
@@ -136,7 +147,6 @@ void __attribute__((naked)) reset_handler(void){
 		"MRC p15, 0, r0, c1, c1, 2                     \n"  // Read NSACR (Non-secure Access Control Register)
 		"ORR r0, r0, #(0x3 << 20)                      \n"  // Setup bits to enable access permissions.  Undocumented Altera/Intel Cyclone V SoC vendor specific
 		"MCR p15, 0, r0, c1, c1, 2                     \n"  // Write NSACR
-		"ISB                                           \n"
 	);
 
 #if(TRU_NEON_ENABLE == 1U)
@@ -220,6 +230,7 @@ void __attribute__((naked)) reset_handler(void){
 		"LDR r1, [r0, #0x0]                            \n"  // Read SCU register
 		"ORR r1, r1, #0x1                              \n"  // Set bit 0 (The Enable bit)
 		"STR r1, [r0, #0x0]                            \n"  // Write back modified value
+
 	);
 #endif
 
@@ -228,7 +239,6 @@ void __attribute__((naked)) reset_handler(void){
 		// Enable SMP cache coherency support
 		"MRC p15, 0, r0, c1, c0, 1                     \n"  // Read ACTLR
 		"ORR r0, r0, #(0x1 << 6)                       \n"  // Set bit 6 to participate in SMP coherency
-		"ORR r0, r0, #(0x1 << 2)                       \n"  // Set bit 2 to enable L1 dside prefetch
 		"ORR r0, r0, #(0x1 << 0)                       \n"  // Set bit 0 to enable maintenance broadcast
 		"MCR p15, 0, r0, c1, c0, 1                     \n"  // Write ACTLR
 	);
@@ -250,7 +260,7 @@ void __attribute__((naked)) reset_handler(void){
 // =======================
 
 #if(ALT_INT_PROVISION_VECTOR_SUPPORT != 0U)
-void _socfpga_main(void) __attribute__((unused, alias("reset_handler")));  // Alias Altera's HWLib reset handler to our function
+	void _socfpga_main(void) __attribute__((unused, alias("reset_handler")));  // Alias Altera's HWLib reset handler to our function
 #endif
 
 // =============================
@@ -267,51 +277,51 @@ void _stack_init(void){
 
 // *Note: Altera's MMU alt_mmu_va_space_create() function will create a huge local array!!  Ensure your stack space is greater than 4K = 4096 bytes!
 #if(TRU_MMU_ENABLE == 1U)
-#define TTB_ATTRIB_ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
-static long unsigned int __attribute__((__section__("MMU_TTB"))) mmu_ttb[4096];  // This array is the MMU table.  It is placed at the specified linker section, aligned to 16KB, defined in the linker file
+	#define TTB_ATTRIB_ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+	static long unsigned int __attribute__((__section__("MMU_TTB"))) mmu_ttb[4096];  // This array is the MMU table.  It is placed at the specified linker section, aligned to 16KB, defined in the linker file
 
-// Define a dummy memory alloc for Altera's MMU function
-static void *mmu_ttb_alloc(const size_t size, void *context){
-	return mmu_ttb;
-}
+	// Define a dummy memory alloc for Altera's MMU function
+	static void *mmu_ttb_alloc(const size_t size, void *context){
+		return mmu_ttb;
+	}
 
-static void mmu_init(void){
-	long unsigned int *ttb1 = NULL;
+	static void mmu_init(void){
+		long unsigned int *ttb1 = NULL;
 
-	// Create MMU attributes (properties)
-	// This is passed to the MMU function telling it what entries to create, and fills them into the MMU table
-	// We only need multiple section entries (1 MB regions) of these 2 types
-	ALT_MMU_MEM_REGION_t regions[] = {
-		// Memory area: 3GB DDR-3 SDRAM
-		{
-			.va         = (void *)0x00000000,
-			.pa         = (void *)0x00000000,
-			.size       = 0xc0000000,
-			.access     = ALT_MMU_AP_PRIV_ACCESS,
-			.attributes = ALT_MMU_ATTR_WBA,
-			.shareable  = ALT_MMU_TTB_S_SHAREABLE,
-			.execute    = ALT_MMU_TTB_XN_DISABLE,
-			.security   = ALT_MMU_TTB_NS_SECURE
-		},
-		// Device area: 1GB of everything else
-		{
-			.va         = (void *)0xc0000000,
-			.pa         = (void *)0xc0000000,
-			.size       = 0x40000000,
-			.access     = ALT_MMU_AP_PRIV_ACCESS,
-			.attributes = ALT_MMU_ATTR_DEVICE,
-			.shareable  = ALT_MMU_TTB_S_SHAREABLE,
-			.execute    = ALT_MMU_TTB_XN_ENABLE,
-			.security   = ALT_MMU_TTB_NS_SECURE
-		}
+		// Create MMU attributes (properties)
+		// This is passed to the MMU function telling it what entries to create, and fills them into the MMU table
+		// We only need multiple section entries (1 MB regions) of these 2 types
+		ALT_MMU_MEM_REGION_t regions[] = {
+			// Memory area: 3GB DDR-3 SDRAM
+			{
+				.va         = (void *)0x00000000,
+				.pa         = (void *)0x00000000,
+				.size       = 0xc0000000,
+				.access     = ALT_MMU_AP_PRIV_ACCESS,
+				.attributes = ALT_MMU_ATTR_WBA,
+				.shareable  = ALT_MMU_TTB_S_SHAREABLE,
+				.execute    = ALT_MMU_TTB_XN_DISABLE,
+				.security   = ALT_MMU_TTB_NS_SECURE
+			},
+			// Device area: 1GB of everything else
+			{
+				.va         = (void *)0xc0000000,
+				.pa         = (void *)0xc0000000,
+				.size       = 0x40000000,
+				.access     = ALT_MMU_AP_PRIV_ACCESS,
+				.attributes = ALT_MMU_ATTR_DEVICE,
+				.shareable  = ALT_MMU_TTB_S_SHAREABLE,
+				.execute    = ALT_MMU_TTB_XN_ENABLE,
+				.security   = ALT_MMU_TTB_NS_SECURE
+			}
 
-	};
+		};
 
-	alt_mmu_init();
-	alt_mmu_va_space_storage_required(regions, TTB_ATTRIB_ARRAY_SIZE(regions));
-	alt_mmu_va_space_create(&ttb1, regions, TTB_ATTRIB_ARRAY_SIZE(regions), mmu_ttb_alloc, NULL);
-	alt_mmu_va_space_enable(ttb1);
-}
+		alt_mmu_init();
+		alt_mmu_va_space_storage_required(regions, TTB_ATTRIB_ARRAY_SIZE(regions));
+		alt_mmu_va_space_create(&ttb1, regions, TTB_ATTRIB_ARRAY_SIZE(regions), mmu_ttb_alloc, NULL);
+		alt_mmu_va_space_enable(ttb1);
+	}
 #endif
 
 #endif
