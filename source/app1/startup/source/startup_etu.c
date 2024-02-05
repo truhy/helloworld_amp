@@ -260,8 +260,8 @@ void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
 
 // For exit to U-Boot we won't be using HWLib's vector, just setting this up to make it happy
 #if(ALT_INT_PROVISION_VECTOR_SUPPORT != 0U)
-	void hwlib_reset_handler(void){ reset_handler(0, 0); }
-	void _socfpga_main(void) __attribute__((unused, alias("hwlib_reset_handler")));  // Alias Altera's HWLib reset handler to our function
+	static void reset_handler_helper(void){ reset_handler(0, 0); }
+	void _socfpga_main(void) __attribute__((unused, alias("reset_handler_helper")));  // Alias Altera's HWLib reset handler to our function
 #endif
 
 // =============================
