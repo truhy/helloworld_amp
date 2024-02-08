@@ -23,7 +23,7 @@
 
 	Version: 20242701
 
-	Support for Cortex A9.
+	Arm Cortex-A9 low level assembly codes.
 */
 
 #ifndef TRU_CORTEX_A9_H
