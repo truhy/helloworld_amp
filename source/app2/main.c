@@ -21,7 +21,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240203
+	Version: 20240211
 	Program: Hello, World! AMP for core 1
 	Target : ARM Cortex-A9 on the DE10-Nano development board (Intel Cyclone V SoC FPGA)
 	Type   : Bare-metal C
@@ -60,7 +60,7 @@
 
 #include "tru_config.h"
 #include "tru_cortex_a9.h"
-#include "tru_c5_uart.h"
+#include "tru_uart_ll.h"
 #include "tru_logger.h"
 #include <string.h>
 
@@ -77,7 +77,7 @@ void tx_hello(void){
 
 	// Transmit message
 	message[strlen(message) - 4] = corenum_ascii;
-	tru_c5_uart_write_str(TRU_C5_UART0_BASE_ADDR, message, strlen(message));
+	tru_uart_ll_write_str(TRU_UART0_BASE_ADDR, message, strlen(message));
 }
 
 int main(int argc, char **argv){

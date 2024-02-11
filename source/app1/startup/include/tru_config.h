@@ -21,13 +21,19 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240203
+	Version: 20240211
 
-	Common configuration
+	Trulib configuration
  */
 
 #ifndef TRU_CONFIG_H
 #define TRU_CONFIG_H
+
+#ifndef TRU_TARGET
+	#ifdef CYCLONEV
+		#define TRU_TARGET TRU_C5SOC
+	#endif
+#endif
 
 #ifdef DEBUG
 	#ifndef TRU_PRINTF_UART

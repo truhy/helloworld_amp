@@ -21,20 +21,26 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240127
+	Version: 20240211
 
-	Utility functions for Cyclone V SoC (HPS).
+	Vendor specific low-level utility functions.
 */
 
-#ifndef TRU_C5_UTIL_H
-#define TRU_C5_UTIL_H
+#ifndef TRU_UTIL_LL_H
+#define TRU_UTIL_LL_H
+
+#include "tru_config.h"
+
+#if(TRU_TARGET == TRU_C5SOC)
 
 #include <stdint.h>
 
 // Support macros
-#define TRU_C5_REG_TYPE uint32_t
-#define TRU_C5_CAST(type, ptr) ((type)(ptr))
-#define tru_c5_io_rd_word(src_addr) (*TRU_C5_CAST(volatile TRU_C5_REG_TYPE *, (src_addr)))
-#define tru_c5_io_wr_word(dst_addr, src_addr) (*TRU_C5_CAST(volatile TRU_C5_REG_TYPE *, (dst_addr)) = (src_addr))
+#define TRU_TARGET_REG_TYPE uint32_t
+#define TRU_TARGET_CAST(type, ptr) ((type)(ptr))
+#define tru_mem_rd_word(src_addr) (*TRU_TARGET_CAST(volatile TRU_TARGET_REG_TYPE *, (src_addr)))
+#define tru_mem_wr_word(dst_addr, src_addr) (*TRU_TARGET_CAST(volatile TRU_TARGET_REG_TYPE *, (dst_addr)) = (src_addr))
+
+#endif
 
 #endif

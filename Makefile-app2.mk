@@ -1,5 +1,5 @@
 # This is free script released into the public domain.
-# GNU make file v20231230 created by Truong Hy.
+# GNU make file v20240211 created by Truong Hy.
 #
 # Builds bare-metal source for the Intel Cyclone V SoC.
 # Depending on the options it will output the following application files:
@@ -72,7 +72,7 @@ SRCS := \
 	$(wildcard $(BM_SRC_PATH2)/hwlib/src/hwmgr/soc_cv_av/*.c) \
 	$(wildcard $(BM_SRC_PATH2)/hwlib/src/utils/*.c) \
 	$(wildcard $(BM_SRC_PATH2)/hwlib/src/utils/*.S) \
-	$(wildcard $(BM_SRC_PATH2)/util/source/*.c)
+	$(wildcard $(BM_SRC_PATH2)/trulib/source/*.c)
 	
 # Remove exclude files
 SRCS := $(filter-out $(EXCLUDE_SRCS),$(SRCS))
@@ -84,7 +84,7 @@ INCS := \
 	-I$(BM_SRC_PATH2)/bsp \
 	-I$(BM_SRC_PATH2)/hwlib/include \
 	-I$(BM_SRC_PATH2)/hwlib/include/soc_cv_av \
-	-I$(BM_SRC_PATH2)/util/include
+	-I$(BM_SRC_PATH2)/trulib/include
 
 # The linker script to use
 LINKER_SCRIPT := $(BM_SRC_PATH2)/ldscript/tru_c5_ddr_core1.ld

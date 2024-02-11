@@ -21,14 +21,14 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240203
+	Version: 20240211
 
 	Minimal implementation of required newlib function stubs.
 */
 
 #include "tru_config.h"
 #if(TRU_PRINTF_UART)
-	#include "tru_c5_uart.h"
+	#include "tru_uart_ll.h"
 #endif
 #include <errno.h>
 #include <sys/stat.h>
@@ -57,7 +57,7 @@
 		}
 
 		int _fstat(int fd, struct stat *buf){
-			buf->st_mode = S_IFCHR;   // Pretend to be a TTY
+			buf->st_mode = S_IFCHR;  // Pretend to be a TTY
 			buf->st_blksize = 0;
 			return 0;
 		}
@@ -77,7 +77,7 @@
 		}
 
 		int _write(int fd, char *ptr, int len){
-			tru_c5_uart_write_str(TRU_C5_UART0_BASE_ADDR, ptr, len);  // Re-target to UART controller
+			tru_uart_ll_write_str(TRU_UART0_BASE_ADDR, ptr, len);  // Re-target to UART controller
 			return len;
 		}
 	#else
