@@ -21,13 +21,15 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240205
+	Version: 20240211
 
 	Exit to U-Boot support.
 */
 
 #ifndef ETU_H
 #define ETU_H
+
+#include "tru_config.h"
 
 #if(TRU_EXIT_TO_UBOOT)
 
