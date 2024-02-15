@@ -1261,6 +1261,7 @@ __asm__(".section .vectors, \"ax\";"
 );
 
 // Disable: warning: FP registers might be clobbered despite 'interrupt' attribute: compile with '-mgeneral-regs-only' [-Wattributes]
+// TODO: the warning is about some ARM CPUs, e.g. Cortex A series do not automatically save floating point registers on interrupt.  If VFP/NEON is enabled, then push VFP/NEON registers onto the stack and restore them at the end
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wattributes"
 void __attribute__ ((interrupt)) __intc_isr_irq(void)
