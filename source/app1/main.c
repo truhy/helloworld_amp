@@ -23,7 +23,7 @@
 
 	Version: 20240211
 	Program: Hello, World! AMP for core 0
-	Target : ARM Cortex-A9 on the DE10-Nano development board (Intel Cyclone V SoC FPGA)
+	Target : ARM Cortex-A9 on the DE10-Nano dev board (Intel Cyclone V SoC FPGA)
 	Type   : Bare-metal C
 
 	About
@@ -34,7 +34,7 @@
 	This sample consists of two separate Eclipse IDE embedded C projects or two
 	applications, app1 and app2.
 
-	Each run independently on one core of the Cortex-A9.  It is for the SoC
+	Each runs independently on one core of the Cortex-A9.  It is for the SoC
 	(aka HPS or CPU) part of the FPGA so it should work on other Cyclone V
 	SoC-FPGA dev boards, e.g.: DE1-SoC, DE-10 Standard, Arrow SoCKit, etc.
 
@@ -46,16 +46,16 @@
 	"alt_" or "ALT_".
 
 	HWLib's linker and startup code do not support the second core (core 1),
-	so included is my own GNU linker script and startup source files.
+	included is my own GNU linker script and startup source files.
 
 	Limitations
 	===========
 
 	It seems the GDB & OpenOCD plugin for "Eclipse IDE for Embedded C/C++" do
-	not support AMP debugging, i.e. we cannot debug both cores in a debug
-	session.  We can only debug one core at a time.  If we debug on core 0,
-	breakpoints on the other core (core 1) are ignored, they are not
-	captured.  This is same the opposite way.
+	not support AMP debugging, i.e. we cannot debug both cores at the same time
+	in a debug session.  We can only debug one core at a time.  If we debug on
+	core 0, breakpoints on the other core (core 1) are ignored, they are not
+	captured.  This is same for the opposite way.
 */
 
 #include "tru_config.h"
