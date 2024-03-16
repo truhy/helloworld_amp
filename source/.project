@@ -3,6 +3,8 @@
 	<name>helloworld_amp</name>
 	<comment></comment>
 	<projects>
+		<project>app1</project>
+		<project>app2</project>
 	</projects>
 	<buildSpec>
 	</buildSpec>

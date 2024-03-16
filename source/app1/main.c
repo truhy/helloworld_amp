@@ -21,7 +21,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240211
+	Version: 20240315
 	Program: Hello, World! AMP for core 0
 	Target : ARM Cortex-A9 on the DE10-Nano dev board (Intel Cyclone V SoC FPGA)
 	Type   : Bare-metal C
@@ -77,7 +77,7 @@
 // "Hello, World!" demonstration
 // =============================
 
-char app1_message[] = "App 1: Hello, World! (AMP, running on core x)\r\n";
+char app1_message[] = "App 1: Hello, World! (AMP, running on core x)\n";
 
 void tx_hello(void){
 	uint32_t mpidr;
@@ -85,8 +85,8 @@ void tx_hello(void){
 	char corenum_ascii = (mpidr & 0x3) + 48;
 
 	// Transmit message
-	app1_message[strlen(app1_message) - 4] = corenum_ascii;
-	tru_uart_ll_write_str(TRU_UART0_BASE_ADDR, app1_message, strlen(app1_message));
+	app1_message[strlen(app1_message) - 3] = corenum_ascii;
+	tru_uart_ll_write_str((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR, app1_message, strlen(app1_message));
 }
 
 // By default, U-Boot enables the L1 D-cache, before enabling core 1 we need to
@@ -119,32 +119,32 @@ enum message_id{
 
 // Messages
 const char *messages[] = {
-	"Arguments from U-Boot:\r\n",
+	"Arguments from U-Boot:\n",
 	"argc: 0x",
 	"argv: ",
-	"\r\n",
-	"none\r\n",
-	"Exiting app1..\r\n"
+	"\n",
+	"none\n",
+	"Exiting app1..\n"
 };
 
 // Transmit CLI arguments
 void tx_cli_args(int argc, char *const argv[]){
-	tru_uart_ll_write_str(TRU_UART0_BASE_ADDR, messages[MSG_INPUTS], strlen(messages[MSG_INPUTS]));
+	tru_uart_ll_write_str((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR, messages[MSG_INPUTS], strlen(messages[MSG_INPUTS]));
 
 	// Transmit input arguments count from U-Boot
-	tru_uart_ll_write_str(TRU_UART0_BASE_ADDR, messages[MSG_ARGC], strlen(messages[MSG_ARGC]));
-	tru_uart_ll_write_inthex(TRU_UART0_BASE_ADDR, argc, 32);
-	tru_uart_ll_write_str(TRU_UART0_BASE_ADDR, messages[MSG_NEWLINE], strlen(messages[MSG_NEWLINE]));
+	tru_uart_ll_write_str((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR, messages[MSG_ARGC], strlen(messages[MSG_ARGC]));
+	tru_uart_ll_write_inthex((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR, argc, 32);
+	tru_uart_ll_write_str((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR, messages[MSG_NEWLINE], strlen(messages[MSG_NEWLINE]));
 
 	if(argc){
 		// Transmit input argument value from U-Boot
 		for(int i = 0; i < argc; i++){
-			tru_uart_ll_write_str(TRU_UART0_BASE_ADDR, messages[MSG_ARGV], strlen(messages[MSG_ARGV]));
-			tru_uart_ll_write_str(TRU_UART0_BASE_ADDR, argv[i], strlen(argv[i]));
-			tru_uart_ll_write_str(TRU_UART0_BASE_ADDR, messages[MSG_NEWLINE], strlen(messages[MSG_NEWLINE]));
+			tru_uart_ll_write_str((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR, messages[MSG_ARGV], strlen(messages[MSG_ARGV]));
+			tru_uart_ll_write_str((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR, argv[i], strlen(argv[i]));
+			tru_uart_ll_write_str((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR, messages[MSG_NEWLINE], strlen(messages[MSG_NEWLINE]));
 		}
 	}else{
-		tru_uart_ll_write_str(TRU_UART0_BASE_ADDR, messages[MSG_NONE], strlen(messages[MSG_NONE]));
+		tru_uart_ll_write_str((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR, messages[MSG_NONE], strlen(messages[MSG_NONE]));
 	}
 }
 
@@ -156,17 +156,17 @@ int main(int argc, char **argv){
 #if(TRU_EXIT_TO_UBOOT)
 	tx_cli_args(uboot_argc, uboot_argv);
 	tx_hello();
-	tru_uart_ll_wait_empty(TRU_UART0_BASE_ADDR);  // Wait for messages to empty out of UART
+	tru_uart_ll_wait_empty((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR);  // Wait for messages to empty out of UART
 
 	// Release core 1 from reset so that it starts executing app2
 	release_core1();
 	delay();  // Wait for core 1 to finish outputting its messages.  TODO: instead of brute-force wait, implement Inter-process communication (IPC) or interrupts/events
 
-	tru_uart_ll_write_str(TRU_UART0_BASE_ADDR, messages[MSG_EXIT], strlen(messages[MSG_EXIT]));
-	tru_uart_ll_wait_empty(TRU_UART0_BASE_ADDR);  // Wait for messages to empty out of UART
+	tru_uart_ll_write_str((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR, messages[MSG_EXIT], strlen(messages[MSG_EXIT]));
+	tru_uart_ll_wait_empty((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR);  // Wait for messages to empty out of UART
 #else
 	tx_hello();
-	tru_uart_ll_wait_empty(TRU_UART0_BASE_ADDR);  // Wait for messages to empty out of UART
+	tru_uart_ll_wait_empty((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR);  // Wait for messages to empty out of UART
 
 	// Release core 1 from reset so that it starts executing app2
 	release_core1();
