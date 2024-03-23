@@ -107,7 +107,7 @@ void __attribute__((noreturn)) _exit(int status){
 
 // Override newlib _exit()
 void __attribute__((noreturn)) _exit(int status){
-	DEBUG_PRINTF("Starting infinity loop\n");
+	//DEBUG_PRINTF("Starting infinity loop\n");
 	while(1);
 }
 

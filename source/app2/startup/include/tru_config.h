@@ -21,7 +21,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240211
+	Version: 20240326
 
 	Trulib configuration
  */
@@ -35,10 +35,13 @@
 
 #define TRU_USER_TARGET            TRU_C5SOC
 #define TRU_USER_EXIT_TO_UBOOT     0U
-#define TRU_USER_DEBUG_PRINT_LEVEL 1U
-#define TRU_USER_PRINTF_UART       1U
-#define TRU_USER_DEBUG_PRINT_R_NL  1U
 #define TRU_USER_NEON_ENABLE       1U
+
+#define TRU_USER_DEBUG_PRINT_LEVEL 1U
+#define TRU_USER_DEBUG_PRINT_UART  1U
+#define TRU_USER_REL_PRINT_LEVEL   0U
+#define TRU_USER_REL_PRINT_UART    0U
+#define TRU_USER_PRINT_UART_R_NL   1U
 
 // ===============================
 // Apply user or override settings
@@ -47,28 +50,40 @@
 #ifdef CYCLONEV
 	#define TRU_TARGET TRU_C5SOC
 #else
-#ifndef TRU_TARGET
-	#define TRU_TARGET TRU_USER_TARGET
-#endif
+	#ifndef TRU_TARGET
+		#define TRU_TARGET TRU_USER_TARGET
+	#endif
 #endif
 
 #ifndef TRU_EXIT_TO_UBOOT
 	#define TRU_EXIT_TO_UBOOT TRU_USER_EXIT_TO_UBOOT
 #endif
 
-#ifndef TRU_DEBUG_PRINT_LEVEL
-	#define TRU_DEBUG_PRINT_LEVEL TRU_USER_DEBUG_PRINT_LEVEL
-#endif
-
-#ifndef TRU_PRINTF_UART
-	#define TRU_PRINTF_UART TRU_USER_PRINTF_UART
-#endif
-
 #ifdef SEMIHOSTING
-	#define TRU_DEBUG_PRINT_R_NL 0U
+	#define TRU_PRINT_UART 0U
+#endif
+
+#ifdef DEBUG
+	#ifndef TRU_DEBUG_PRINT_LEVEL
+		#define TRU_DEBUG_PRINT_LEVEL TRU_USER_DEBUG_PRINT_LEVEL
+	#endif
+
+	#ifndef TRU_PRINT_UART
+		#define TRU_PRINT_UART TRU_USER_DEBUG_PRINT_UART
+	#endif
 #else
+	#ifndef TRU_REL_PRINT_LEVEL
+		#define TRU_DEBUG_PRINT_LEVEL TRU_USER_REL_PRINT_LEVEL
+	#endif
+
+	#ifndef TRU_PRINT_UART
+		#define TRU_PRINT_UART TRU_USER_REL_PRINT_UART
+	#endif
+#endif
+
+#ifndef TRU_PRINT_UART_R_NL
 	// 1U == Enables insertion of '\r' for each '\n' character
-	#define TRU_DEBUG_PRINT_R_NL TRU_USER_DEBUG_PRINT_R_NL
+	#define TRU_PRINT_UART_R_NL TRU_USER_PRINT_UART_R_NL
 #endif
 
 // ======================

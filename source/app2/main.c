@@ -85,6 +85,7 @@ int main(int argc, char **argv){
 	#endif
 
 	tx_hello();
+	tru_uart_ll_wait_empty((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR);  // Wait for messages to empty out of UART
 
 	return 0;
 }

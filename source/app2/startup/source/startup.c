@@ -71,7 +71,7 @@
 #endif
 
 #if(TRU_MMU_ENABLE == 1U)
-	static void mmu_init(void);
+	void mmu_init(void);
 #endif
 
 // =============
@@ -278,14 +278,14 @@ void _stack_init(void){
 // *Note: Altera's MMU alt_mmu_va_space_create() function will create a huge local array!!  Ensure your stack space is greater than 4K = 4096 bytes!
 #if(TRU_MMU_ENABLE == 1U)
 	#define TTB_ATTRIB_ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
-	static long unsigned int __attribute__((__section__("MMU_TTB"))) mmu_ttb[4096];  // This array is the MMU table.  It is placed at the specified linker section, aligned to 16KB, defined in the linker file
+	long unsigned int __attribute__((__section__("MMU_TTB"))) mmu_ttb[4096];  // This array is the MMU table.  It is placed at the specified linker section, aligned to 16KB, defined in the linker file
 
 	// Define a dummy memory alloc for Altera's MMU function
-	static void *mmu_ttb_alloc(const size_t size, void *context){
+	void *mmu_ttb_alloc(const size_t size, void *context){
 		return mmu_ttb;
 	}
 
-	static void mmu_init(void){
+	void mmu_init(void){
 		long unsigned int *ttb1 = NULL;
 
 		// Create MMU attributes (properties)
@@ -297,18 +297,18 @@ void _stack_init(void){
 				.va         = (void *)0x00000000,
 				.pa         = (void *)0x00000000,
 				.size       = 0xc0000000,
-				.access     = ALT_MMU_AP_PRIV_ACCESS,
+				.access     = ALT_MMU_AP_FULL_ACCESS,
 				.attributes = ALT_MMU_ATTR_WBA,
 				.shareable  = ALT_MMU_TTB_S_SHAREABLE,
 				.execute    = ALT_MMU_TTB_XN_DISABLE,
-				.security   = ALT_MMU_TTB_NS_SECURE
+				.security   = ALT_MMU_TTB_NS_NON_SECURE
 			},
 			// Device area: 1GB of everything else
 			{
 				.va         = (void *)0xc0000000,
 				.pa         = (void *)0xc0000000,
 				.size       = 0x40000000,
-				.access     = ALT_MMU_AP_PRIV_ACCESS,
+				.access     = ALT_MMU_AP_FULL_ACCESS,
 				.attributes = ALT_MMU_ATTR_DEVICE,
 				.shareable  = ALT_MMU_TTB_S_SHAREABLE,
 				.execute    = ALT_MMU_TTB_XN_ENABLE,
