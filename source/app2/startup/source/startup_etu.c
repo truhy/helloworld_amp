@@ -48,7 +48,7 @@
 // =============
 
 // Notes:
-// - Newlib will initialise the .bss section for us so no need to do it here
+// - Newlib's startup() will initialise the .bss section
 // - In Altera's HWLib their vector table is named __intc_interrupt_vector, see alt_interrupt.c
 // - In Altera's HWLib, their vector table branches to _socfpga_main() as the reset handler, see alt_interrupt.c
 void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
@@ -119,7 +119,7 @@ void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
 #if(TRU_CLEAN_CACHE == 1U)
 	// Since we are starting from U-Boot which may have the cache enabled,
 	// loaded file(s) and some global variables may be cached and stay dirty.
-	// Let's make sure that all dirty lines are written back into memory, in
+	// Let's make sure that all dirty lines are written back into memory - in
 	// case cache settings are changed later on
 	alt_cache_l1_data_clean_all();
 	alt_cache_l2_clean_all();
