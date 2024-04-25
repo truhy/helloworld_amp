@@ -100,6 +100,12 @@ void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
 		"MRC p15, 0, r2, c12, c0, 0                    \n"
 		"STR r2, [r3]                                  \n"
 
+		// Switch into secure access mode
+		"MRC p15, 0, r0, c1, c1, 2                          \n"  // Read NSACR (Non-secure Access Control Register)
+		"ORR r0, r0, #(0x3 << 20)                           \n"  // Setup bits to enable access permissions.  Undocumented Altera/Intel Cyclone V SoC vendor specific
+		"MCR p15, 0, r0, c1, c1, 2                          \n"  // Write NSACR
+		"ISB                                                \n"
+
 		// Setup stack for each exception mode
 		// Note: When you call HWLib's interrupt init function the stacks will be change to a global variable array, and this setup will be dropped
 		"CPS #0x11                                     \n"
@@ -155,13 +161,6 @@ void __attribute__((naked)) reset_handler(int argc, char *const argv[]){
 #if(TRU_L1_CACHE_ENABLE != 2U)
 	alt_cache_l1_disable_all();
 #endif
-
-	__asm__ volatile(
-		// Enable permissions
-		"MRC p15, 0, r0, c1, c1, 2                     \n"  // Read NSACR (Non-secure Access Control Register)
-		"ORR r0, r0, #(0x3 << 20)                      \n"  // Setup bits to enable access permissions.  Undocumented Altera/Intel Cyclone V SoC vendor specific
-		"MCR p15, 0, r0, c1, c1, 2                     \n"  // Write NSACR
-	);
 
 #if(TRU_NEON_ENABLE == 1U)
 	__asm__ volatile(
