@@ -21,7 +21,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240315
+	Version: 20240505
 	Program: Hello, World! AMP for core 1
 	Target : ARM Cortex-A9 on the DE10-Nano dev board (Intel Cyclone V SoC FPGA)
 	Type   : Bare-metal C
@@ -60,23 +60,20 @@
 
 #include "tru_config.h"
 #include "tru_cortex_a9.h"
-#include "tru_uart_ll.h"
-#include <string.h>
+#include "tru_c5soc_hps_uart_ll.h"
+#include <stdio.h>
 
 #ifdef SEMIHOSTING
 	extern void initialise_monitor_handles(void);  // Reference function header from the external Semihosting library
 #endif
 
-char message[] = "App 2: Hello, World! (AMP, running on core x)\n";
-
 void tx_hello(void){
 	uint32_t mpidr;
 	__read_mpidr(mpidr);  // Read MPIDR register to get current processor number
-	char corenum_ascii = (mpidr & 0x3) + 48;
+	char corenum = (mpidr & 0x3);
 
 	// Transmit message
-	message[strlen(message) - 3] = corenum_ascii;
-	tru_uart_ll_write_str((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR, message, strlen(message));
+	printf("App 2: Hello, World! (AMP, running on core %i)\n", corenum);
 }
 
 int main(int argc, char **argv){
@@ -85,7 +82,7 @@ int main(int argc, char **argv){
 	#endif
 
 	tx_hello();
-	tru_uart_ll_wait_empty((TRU_TARGET_TYPE *)TRU_UART0_BASE_ADDR);  // Wait for messages to empty out of UART
+	tru_hps_uart_ll_wait_empty((TRU_TARGET_TYPE *)TRU_HPS_UART0_BASE);  // Wait for messages to empty out of UART
 
 	return 0;
 }
