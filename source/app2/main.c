@@ -41,17 +41,17 @@
 	On a cold or warm reset, core 0 is in a running state and core 1 is kept in
 	the reset state.  App1 running on core 0 will release core 1 from reset.
 
-	Makes use the Intel/Altera HWLib bare-metal library for some of the low
+	Makes use of Intel/Altera HWLib bare-metal library for some of the low
 	level hardware access, and these are identified by their naming prefix
 	"alt_" or "ALT_".
 
-	HWLib's linker and startup code do not support the second core (core 1),
+	HWLib's linker and startup code does not support the second core (core 1),
 	so included is my own GNU linker script and startup source files.
 
 	Limitations
 	===========
 
-	It seems the GDB & OpenOCD plugin for "Eclipse IDE for Embedded C/C++" do
+	It seems the GDB & OpenOCD plugin for "Eclipse IDE for Embedded C/C++" does
 	not support AMP debugging, i.e. we cannot debug both cores at the same time
 	in a debug session.  We can only debug one core at a time.  If we debug on
 	core 0, breakpoints on the other core (core 1) are ignored, they are not
