@@ -31,7 +31,7 @@
 
 	An asymmetric multiprocessing (AMP) version of "Hello, World!".
 
-	This sample consists of two separate Eclipse IDE embedded C projects or two
+	This example consists of two separate Eclipse IDE embedded C projects or two
 	applications, app1 and app2.
 
 	Each runs independently on one core of the Cortex-A9.  It is for the SoC
