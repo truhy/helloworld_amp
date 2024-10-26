@@ -1,6 +1,7 @@
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
-ENTRY(reset_handler)
+
+ENTRY(Reset_Handler)
 
 /* Location and size of core 1 program */
 __CORE1_RAM_BASE    = 0x0;
@@ -36,7 +37,8 @@ SECTIONS {
     .vectors : {
         __vectors = .;
         
-        *(.vectors)
+        *(RESET)                    /* Used by CMSIS and my startup for vector table */
+        *(.vectors)                 /* Used by HWLib */
         
         __evectors = .;
     } > __CORE1_RAM : _LOAD_RX

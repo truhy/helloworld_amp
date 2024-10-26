@@ -30,24 +30,24 @@ bin ?= 0
 uimg ?= 0
 
 # These variables are assumed to be set already
-ifndef BM_PROGRAM_NAME2
-$(error BM_PROGRAM_NAME2 environment variable is not set)
+ifndef APP_PROGRAM_NAME2
+$(error APP_PROGRAM_NAME2 environment variable is not set)
 endif
-ifndef BM_HOME_PATH
-$(error BM_HOME_PATH environment variable is not set)
+ifndef APP_HOME_PATH
+$(error APP_HOME_PATH environment variable is not set)
 endif
-ifndef BM_OUT_PATH
-$(error BM_OUT_PATH environment variable is not set)
+ifndef APP_OUT_PATH
+$(error APP_OUT_PATH environment variable is not set)
 endif
-ifndef BM_SRC_PATH2
-$(error BM_SRC_PATH2 environment variable is not set)
+ifndef APP_SRC_PATH2
+$(error APP_SRC_PATH2 environment variable is not set)
 endif
 
 # Convert back-slashes
 ifeq ($(OS),Windows_NT)
-BM_HOME_PATH := $(subst \,/,$(BM_HOME_PATH))
-BM_OUT_PATH := $(subst \,/,$(BM_OUT_PATH))
-BM_SRC_PATH2 := $(subst \,/,$(BM_SRC_PATH2))
+APP_HOME_PATH := $(subst \,/,$(APP_HOME_PATH))
+APP_OUT_PATH := $(subst \,/,$(APP_OUT_PATH))
+APP_SRC_PATH2 := $(subst \,/,$(APP_SRC_PATH2))
 endif
 
 # ============
@@ -56,38 +56,36 @@ endif
 
 # List of source folders and files to exclude from the build
 EXCLUDE_SRCS := \
-	$(BM_SRC_PATH2)/hwlib/src/hwmgr/soc_a10 \
-	$(BM_SRC_PATH2)/hwlib/src/hwmgr/alt_eth_phy_ksz9031.c \
-	$(BM_SRC_PATH2)/hwlib/src/hwmgr/alt_ethernet.c \
-	$(BM_SRC_PATH2)/hwlib/src/utils/alt_base.S \
-	$(BM_SRC_PATH2)/hwlib/src/utils/alt_base.c \
-	$(BM_SRC_PATH2)/hwlib/src/utils/alt_p2uart.c \
-	$(BM_SRC_PATH2)/hwlib/src/utils/alt_printf.c
+	$(APP_SRC_PATH2)/hwlib/src/hwmgr/soc_a10 \
+	$(APP_SRC_PATH2)/hwlib/src/hwmgr/alt_eth_phy_ksz9031.c \
+	$(APP_SRC_PATH2)/hwlib/src/hwmgr/alt_ethernet.c \
+	$(APP_SRC_PATH2)/hwlib/src/utils/alt_base.S \
+	$(APP_SRC_PATH2)/hwlib/src/utils/alt_base.c \
+	$(APP_SRC_PATH2)/hwlib/src/utils/alt_p2uart.c \
+	$(APP_SRC_PATH2)/hwlib/src/utils/alt_printf.c
 
 # Get and build a list of source file names from the file system with these locations and pattern
 SRCS := \
-	$(wildcard $(BM_SRC_PATH2)/*.c) \
-	$(wildcard $(BM_SRC_PATH2)/startup/source/*.c) \
-	$(wildcard $(BM_SRC_PATH2)/hwlib/src/hwmgr/*.c) \
-	$(wildcard $(BM_SRC_PATH2)/hwlib/src/hwmgr/soc_cv_av/*.c) \
-	$(wildcard $(BM_SRC_PATH2)/hwlib/src/utils/*.c) \
-	$(wildcard $(BM_SRC_PATH2)/hwlib/src/utils/*.S) \
-	$(wildcard $(BM_SRC_PATH2)/trulib/source/*.c)
+	$(wildcard $(APP_SRC_PATH2)/*.c) \
+	$(wildcard $(APP_SRC_PATH2)/hwlib/src/hwmgr/*.c) \
+	$(wildcard $(APP_SRC_PATH2)/hwlib/src/hwmgr/soc_cv_av/*.c) \
+	$(wildcard $(APP_SRC_PATH2)/hwlib/src/utils/*.c) \
+	$(wildcard $(APP_SRC_PATH2)/hwlib/src/utils/*.S) \
+	$(wildcard $(APP_SRC_PATH2)/trulib/source/*.c)
 	
 # Remove exclude files
 SRCS := $(filter-out $(EXCLUDE_SRCS),$(SRCS))
 
 # List of header include search paths
 INCS := \
-	-I$(BM_SRC_PATH2) \
-	-I$(BM_SRC_PATH2)/startup/include \
-	-I$(BM_SRC_PATH2)/bsp \
-	-I$(BM_SRC_PATH2)/hwlib/include \
-	-I$(BM_SRC_PATH2)/hwlib/include/soc_cv_av \
-	-I$(BM_SRC_PATH2)/trulib/include
+	-I$(APP_SRC_PATH2) \
+	-I$(APP_SRC_PATH2)/bsp \
+	-I$(APP_SRC_PATH2)/hwlib/include \
+	-I$(APP_SRC_PATH2)/hwlib/include/soc_cv_av \
+	-I$(APP_SRC_PATH2)/trulib/include
 
 # The linker script to use
-LINKER_SCRIPT := $(BM_SRC_PATH2)/ldscript/tru_c5_ddr_core1.ld
+LINKER_SCRIPT := $(APP_SRC_PATH2)/ldscript/tru_c5_ddr_core1.ld
 
 # =========================================
 # Common linker and compiler build settings
@@ -106,7 +104,7 @@ CFLAGS_SYMBOL_ETU := -DTRU_EXIT_TO_UBOOT=1
 # ================================
 
 DBG_CFLAGS_OD := -g3 -O0
-REL_CFLAGS_OD := -Os
+REL_CFLAGS_OD := -O2
 
 # =====================================
 # Create list of compiler flags (Debug)
@@ -180,26 +178,26 @@ REL_LDFLAGS := $(REL_LDFLAGS) -T$(LINKER_SCRIPT)
 # App settings (Debug)
 # ====================
 
-DBG_PATH := $(BM_OUT_PATH)/DebugApp2
-DBG_ELF := $(DBG_PATH)/$(BM_PROGRAM_NAME2).elf
-DBG_CFLAGS_FILE := $(DBG_PATH)/$(BM_PROGRAM_NAME2).cflags.txt
-DBG_ELF_LOAD_FILE := $(DBG_PATH)/$(BM_PROGRAM_NAME2).load.txt
-DBG_ELF_ENTRY_FILE := $(DBG_PATH)/$(BM_PROGRAM_NAME2).entry.txt
-DBG_BIN := $(DBG_PATH)/$(BM_PROGRAM_NAME2).bin
-DBG_UIMG := $(DBG_PATH)/$(BM_PROGRAM_NAME2).uimg
+DBG_PATH := $(APP_OUT_PATH)/DebugApp2
+DBG_ELF := $(DBG_PATH)/$(APP_PROGRAM_NAME2).elf
+DBG_CFLAGS_FILE := $(DBG_PATH)/$(APP_PROGRAM_NAME2).cflags.txt
+DBG_ELF_LOAD_FILE := $(DBG_PATH)/$(APP_PROGRAM_NAME2).load.txt
+DBG_ELF_ENTRY_FILE := $(DBG_PATH)/$(APP_PROGRAM_NAME2).entry.txt
+DBG_BIN := $(DBG_PATH)/$(APP_PROGRAM_NAME2).bin
+DBG_UIMG := $(DBG_PATH)/$(APP_PROGRAM_NAME2).uimg
 DBG_OBJS := $(patsubst %.c,$(DBG_PATH)/%.o,$(SRCS))
 
 # ======================
 # App settings (Release)
 # ======================
 
-REL_PATH := $(BM_OUT_PATH)/ReleaseApp2
-REL_ELF := $(REL_PATH)/$(BM_PROGRAM_NAME2).elf
-REL_CFLAGS_FILE := $(REL_PATH)/$(BM_PROGRAM_NAME2).cflags.txt
-REL_ELF_LOAD_FILE := $(REL_PATH)/$(BM_PROGRAM_NAME2).load.txt
-REL_ELF_ENTRY_FILE := $(REL_PATH)/$(BM_PROGRAM_NAME2).entry.txt
-REL_BIN := $(REL_PATH)/$(BM_PROGRAM_NAME2).bin
-REL_UIMG := $(REL_PATH)/$(BM_PROGRAM_NAME2).uimg
+REL_PATH := $(APP_OUT_PATH)/ReleaseApp2
+REL_ELF := $(REL_PATH)/$(APP_PROGRAM_NAME2).elf
+REL_CFLAGS_FILE := $(REL_PATH)/$(APP_PROGRAM_NAME2).cflags.txt
+REL_ELF_LOAD_FILE := $(REL_PATH)/$(APP_PROGRAM_NAME2).load.txt
+REL_ELF_ENTRY_FILE := $(REL_PATH)/$(APP_PROGRAM_NAME2).entry.txt
+REL_BIN := $(REL_PATH)/$(APP_PROGRAM_NAME2).bin
+REL_UIMG := $(REL_PATH)/$(APP_PROGRAM_NAME2).uimg
 REL_OBJS := $(patsubst %.c,$(REL_PATH)/%.o,$(SRCS))
 
 # ============================
@@ -286,7 +284,7 @@ clean_1:
 
 # Clean root folder
 clean: clean_1
-	@if [ -d "$(BM_OUT_PATH)" ] && [ -z "$$(ls -A $(BM_OUT_PATH))" ]; then echo rm -df $(BM_OUT_PATH); rm -df $(BM_OUT_PATH); fi
+	@if [ -d "$(APP_OUT_PATH)" ] && [ -z "$$(ls -A $(APP_OUT_PATH))" ]; then echo rm -df $(APP_OUT_PATH); rm -df $(APP_OUT_PATH); fi
 
 # ===============================================================
 # Clean temporary files rules (does not remove user target files)
@@ -305,7 +303,7 @@ cleantemp_1:
 
 # Clean root folder
 cleantemp: cleantemp_1
-	@if [ -d "$(BM_OUT_PATH)" ]; then \
+	@if [ -d "$(APP_OUT_PATH)" ]; then \
 		echo rm -f $(DBG_OBJS) $(DBG_CFLAGS_FILE) $(DBG_ELF_LOAD_FILE) $(DBG_ELF_ENTRY_FILE); rm -f $(DBG_OBJS) $(DBG_CFLAGS_FILE) $(DBG_ELF_LOAD_FILE) $(DBG_ELF_ENTRY_FILE); \
 		echo rm -f $(REL_OBJS) $(REL_CFLAGS_FILE) $(REL_ELF_LOAD_FILE) $(REL_ELF_ENTRY_FILE); rm -f $(REL_OBJS) $(REL_CFLAGS_FILE) $(REL_ELF_LOAD_FILE) $(REL_ELF_ENTRY_FILE); \
 	fi
@@ -496,8 +494,8 @@ $(REL_BIN): $(REL_ELF)
 
 # Convert binary to U-Boot bootable image
 $(DBG_UIMG): $(DBG_BIN) $(DBG_ELF_LOAD_FILE) $(DBG_ELF_ENTRY_FILE)
-	$(MK) -A arm -O u-boot -T standalone -C none -a $(DBG_ELF_LOAD_TEXT) -e $(DBG_ELF_ENTRY_TEXT) -n $(BM_PROGRAM_NAME2) -d $(DBG_BIN) $@
+	$(MK) -A arm -O u-boot -T standalone -C none -a $(DBG_ELF_LOAD_TEXT) -e $(DBG_ELF_ENTRY_TEXT) -n $(APP_PROGRAM_NAME2) -d $(DBG_BIN) $@
 
 # Convert binary to U-Boot bootable image
 $(REL_UIMG): $(REL_BIN) $(REL_ELF_LOAD_FILE) $(REL_ELF_ENTRY_FILE)
-	$(MK) -A arm -O u-boot -T standalone -C none -a $(REL_ELF_LOAD_TEXT) -e $(REL_ELF_ENTRY_TEXT) -n $(BM_PROGRAM_NAME2) -d $(REL_BIN) $@
+	$(MK) -A arm -O u-boot -T standalone -C none -a $(REL_ELF_LOAD_TEXT) -e $(REL_ELF_ENTRY_TEXT) -n $(APP_PROGRAM_NAME2) -d $(REL_BIN) $@

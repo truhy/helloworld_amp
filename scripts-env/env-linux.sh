@@ -9,13 +9,13 @@ SCRIPT_PATH="$(dirname "$SCRIPT_PATH")"
 TOOLCHAIN_PATH=~/devtools/xpack-arm-none-eabi-gcc-13.2.1-1.1/bin
 OPENOCD_PATH=~/devtools/xpack-openocd-0.12.0-2/bin
 
-# Bare-metal settings
-export BM_OUT_PATH=$SCRIPT_PATH
-export BM_HOME_PATH=$SCRIPT_PATH
-export BM_SRC_PATH1=source/app1
-export BM_PROGRAM_NAME1=hwamp_app1
-export BM_SRC_PATH2=source/app2
-export BM_PROGRAM_NAME2=hwamp_app2
+# Application settings
+export APP_HOME_PATH=$SCRIPT_PATH
+export APP_OUT_PATH=$SCRIPT_PATH
+export APP_SRC_PATH1=source/app1
+export APP_PROGRAM_NAME1=hwamp_app1
+export APP_SRC_PATH2=source/app2
+export APP_PROGRAM_NAME2=hwamp_app2
 
 # U-Boot settings
 export UBOOT_OUT_PATH=$SCRIPT_PATH

@@ -9,13 +9,13 @@ SET MAKE_PATH=C:\devtools\xpack-windows-build-tools-4.4.1-2\bin
 SET TOOLCHAIN_PATH=C:\devtools\xpack-arm-none-eabi-gcc-13.2.1-1.1\bin
 SET OPENOCD_PATH=C:\devtools\xpack-openocd-0.12.0-2\bin
 
-:: Bare-metal settings
-SET BM_OUT_PATH=%SCRIPT_PATH%
-SET BM_HOME_PATH=%SCRIPT_PATH%
-SET BM_SRC_PATH1=source/app1
-SET BM_PROGRAM_NAME1=hwamp_app1
-SET BM_SRC_PATH2=source/app2
-SET BM_PROGRAM_NAME2=hwamp_app2
+:: Application settings
+SET APP_HOME_PATH=%SCRIPT_PATH%
+SET APP_OUT_PATH=%SCRIPT_PATH%
+SET APP_SRC_PATH1=source/app1
+SET APP_PROGRAM_NAME1=hwamp_app1
+SET APP_SRC_PATH2=source/app2
+SET APP_PROGRAM_NAME2=hwamp_app2
 
 :: Search path settings
 SET path=%path%;%SCRIPT_PATH%\scripts-env;%SCRIPT_PATH%\scripts-win
