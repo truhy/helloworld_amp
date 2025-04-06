@@ -130,17 +130,17 @@ int main(int argc, char **argv){
 #if(TRU_EXIT_TO_UBOOT)
 	tx_cli_args(uboot_argc, uboot_argv);
 	tx_hello();
-	tru_hps_uart_ll_wait_empty((TRU_TARGET_TYPE *)TRU_HPS_UART0_BASE);  // Wait for messages to empty out of UART
+	tru_hps_uart_ll_wait_empty((void *)TRU_HPS_UART0_BASE);  // Wait for messages to empty out of UART
 
 	// Release core 1 from reset so that it starts executing app2
 	release_core1();
 	delay();  // Wait for core 1 to finish outputting its messages.  TODO: instead of brute-force wait, implement Inter-process communication (IPC) or interrupts/events
 
 	printf("Exiting application..\n");
-	tru_hps_uart_ll_wait_empty((TRU_TARGET_TYPE *)TRU_HPS_UART0_BASE);  // Wait for messages to empty out of UART
+	tru_hps_uart_ll_wait_empty((void *)TRU_HPS_UART0_BASE);  // Wait for messages to empty out of UART
 #else
 	tx_hello();
-	tru_hps_uart_ll_wait_empty((TRU_TARGET_TYPE *)TRU_HPS_UART0_BASE);  // Wait for messages to empty out of UART
+	tru_hps_uart_ll_wait_empty((void *)TRU_HPS_UART0_BASE);  // Wait for messages to empty out of UART
 
 	// Release core 1 from reset so that it starts executing app2
 	release_core1();

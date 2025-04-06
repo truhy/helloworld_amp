@@ -36,12 +36,12 @@ PHDRS {
 
 SECTIONS {
     .vectors : {
-        __vectors = .;
+        Image$$VECTORS$$Base = .;   /* Used by CMSIS */
         
         *(RESET)                    /* Used by CMSIS and my startup for vector table */
         *(.vectors)                 /* Used by HWLib */
         
-        __evectors = .;
+        Image$$VECTORS$$Limit = .;  /* Used by CMSIS */
     } > __CORE0_RAM : __LOAD_RX
 
     .text : {
@@ -70,12 +70,21 @@ SECTIONS {
         *(.rodata*)    /* .rodata* sections (constants, strings, etc.) */
         . = ALIGN(4);
     } > __CORE0_RAM : __LOAD_RX
-    
-    /* MMU L1 and L2 translation table */
-    .mmu_ttb (ALIGN(16384)) : {
-        __TTB_BASE = .;
-        *(MMU_TTB)
-        __TTB_LIMIT = .;
+
+		/* MMU L1 translation table block */
+    .mmu_ttb_l1 : {
+				. = ALIGN(16384);
+        __mmu_ttb_l1_entries_start = .;
+				*(mmu_ttb_l1_entries)
+        __mmu_ttb_l1_entries_end = .;
+    } > __CORE0_RAM : __LOAD_RX
+		
+		/* MMU L2 translation table block */
+    .mmu_ttb_l2 : {
+				. = ALIGN(16384);
+				__mmu_ttb_l2_entries_start = .;
+        *(mmu_ttb_l2_entries)
+        __mmu_ttb_l2_entries_end = .;
     } > __CORE0_RAM : __LOAD_RX
 
     .ARM.extab : {
@@ -164,6 +173,16 @@ SECTIONS {
         . = ALIGN(4);
         __data_end = .;  /* User defined symbol */
     } > __CORE0_RAM : __LOAD_RW
+
+		.dma_buffer (NOLOAD) : {
+			. = ALIGN(1048576);
+			__dma_buffer_start = .;
+			
+			*(.dma_buffer)
+			
+			. = ALIGN(1048576);
+			__dma_buffer_end = .;
+		} > __CORE0_RAM : __LOAD_RW
 
     .bss (NOLOAD) : {
         . = ALIGN(4);

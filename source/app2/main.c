@@ -82,7 +82,7 @@ int main(int argc, char **argv){
 	#endif
 
 	tx_hello();
-	tru_hps_uart_ll_wait_empty((TRU_TARGET_TYPE *)TRU_HPS_UART0_BASE);  // Wait for messages to empty out of UART
+	tru_hps_uart_ll_wait_empty((void *)TRU_HPS_UART0_BASE);  // Wait for messages to empty out of UART
 
 	return 0;
 }

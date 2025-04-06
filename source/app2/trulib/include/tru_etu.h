@@ -21,7 +21,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240430
+	Version: 20250311
 
 	Exit to U-Boot support.
 */
@@ -29,7 +29,11 @@
 #ifndef TRU_ETU_H
 #define TRU_ETU_H
 
-#if(TRU_EXIT_TO_UBOOT == 1U)
+#include "tru_config.h"
+
+#if(TRU_TARGET == TRU_TARGET_C5SOC)
+
+#if defined(TRU_EXIT_TO_UBOOT) && TRU_EXIT_TO_UBOOT == 1U
 
 extern int uboot_argc;
 extern char **uboot_argv;
@@ -42,6 +46,8 @@ extern long unsigned int uboot_svc_sp;
 extern long unsigned int uboot_irq_sp;
 extern long unsigned int uboot_fiq_sp;
 extern long unsigned int uboot_vbar;
+
+#endif
 
 #endif
 

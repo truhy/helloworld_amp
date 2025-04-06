@@ -29,19 +29,19 @@ MEMORY {
 /*             bit0 = execute (x)           */
 /* Examples: 4 = r, 5 = rx, 6 = rw, 7 = rwx */
 PHDRS {
-    _LOAD_RX PT_LOAD FLAGS(5);
-    _LOAD_RW PT_LOAD FLAGS(6);
+    __LOAD_RX PT_LOAD FLAGS(5);
+    __LOAD_RW PT_LOAD FLAGS(6);
 }
 
 SECTIONS {
     .vectors : {
-        __vectors = .;
+        Image$$VECTORS$$Base = .;   /* Used by CMSIS */
         
         *(RESET)                    /* Used by CMSIS and my startup for vector table */
         *(.vectors)                 /* Used by HWLib */
         
-        __evectors = .;
-    } > __CORE1_RAM : _LOAD_RX
+        Image$$VECTORS$$Limit = .;  /* Used by CMSIS */
+    } > __CORE1_RAM : __LOAD_RX
 
     .core1_waiter : {
         . = ALIGN(4);
@@ -49,7 +49,7 @@ SECTIONS {
         . = . + __CORE1_WAITER_SIZE;
         
         . = ALIGN(4);
-    } > __CORE1_RAM : _LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
 
     .text : {
         . = ALIGN(4);
@@ -69,27 +69,36 @@ SECTIONS {
         
         . = ALIGN(4);
         __etext = .;
-    } > __CORE1_RAM : _LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
 
     .rodata : {
         . = ALIGN(4);
         *(.rodata)     /* .rodata sections (constants, strings, etc.) */
         *(.rodata*)    /* .rodata* sections (constants, strings, etc.) */
         . = ALIGN(4);
-    } > __CORE1_RAM : _LOAD_RX
-    
-    /* MMU L1 and L2 translation table */
-    .mmu_ttb (ALIGN(16384)) : {
-        __TTB_BASE = .;
-        *(MMU_TTB)
-        __TTB_LIMIT = .;
-    } >__CORE1_RAM :_LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
+
+		/* MMU L1 translation table block */
+    .mmu_ttb_l1 : {
+				. = ALIGN(16384);
+        __mmu_ttb_l1_entries_start = .;
+				*(mmu_ttb_l1_entries)
+        __mmu_ttb_l1_entries_end = .;
+    } > __CORE1_RAM : __LOAD_RX
+
+		/* MMU L2 translation table block */
+    .mmu_ttb_l2 : {
+				. = ALIGN(16384);
+				__mmu_ttb_l2_entries_start = .;
+        *(mmu_ttb_l2_entries)
+        __mmu_ttb_l2_entries_end = .;
+    } > __CORE1_RAM : __LOAD_RX
 
     .ARM.extab : {
         . = ALIGN(4);
         *(.ARM.extab* .gnu.linkonce.armextab.*)
         . = ALIGN(4);
-    } > __CORE1_RAM : _LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
 
     .ARM.exidx : {
         . = ALIGN(4);
@@ -97,7 +106,7 @@ SECTIONS {
         *(.ARM.exidx*)
         __exidx_end = .;
         . = ALIGN(4);
-    } > __CORE1_RAM : _LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
 
     /* C++ runtime: static constructors */
     .ctors : {
@@ -107,7 +116,7 @@ SECTIONS {
         KEEP(*(SORT(.ctors.*)))
         KEEP(*crtend.o(.ctors))
         . = ALIGN(4);
-    } > __CORE1_RAM : _LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
 
     /* C++ runtime: static destructors and atexit() */
     .dtors : {
@@ -117,7 +126,7 @@ SECTIONS {
         KEEP(*(SORT(.dtors.*)))
         KEEP(*crtend.o(.dtors))
         . = ALIGN(4);
-    } > __CORE1_RAM : _LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
 
     .preinit_array : {
         . = ALIGN(4);
@@ -125,7 +134,7 @@ SECTIONS {
         KEEP (*(.preinit_array*))
         PROVIDE_HIDDEN (__preinit_array_end = .);
         . = ALIGN(4);
-    } > __CORE1_RAM : _LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
 
     .init_array : {
         . = ALIGN(4);
@@ -134,7 +143,7 @@ SECTIONS {
         KEEP (*(.init_array*))
         PROVIDE_HIDDEN (__init_array_end = .);
         . = ALIGN(4);
-    } > __CORE1_RAM : _LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
 
     .fini_array : {
         . = ALIGN(4);
@@ -143,7 +152,7 @@ SECTIONS {
         KEEP (*(.fini_array*))
         PROVIDE_HIDDEN (__fini_array_end = .);
         . = ALIGN(4);
-    } > __CORE1_RAM : _LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
 
     .eh_frame_hdr : {
         . = ALIGN(4);
@@ -151,14 +160,14 @@ SECTIONS {
         *(.eh_frame_entry)
         *(.eh_frame_entry.*)
         . = ALIGN(4);
-    } > __CORE1_RAM : _LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
 
     .eh_frame : {
         . = ALIGN(4);
         KEEP(*(.eh_frame))
         *(.eh_frame.*)
         . = ALIGN(4);
-    } > __CORE1_RAM : _LOAD_RX
+    } > __CORE1_RAM : __LOAD_RX
 
     .data : {
         . = ALIGN(4);
@@ -170,7 +179,17 @@ SECTIONS {
         
         . = ALIGN(4);
         __data_end = .;  /* User defined symbol */
-    } > __CORE1_RAM : _LOAD_RW
+    } > __CORE1_RAM : __LOAD_RW
+
+		.dma_buffer (NOLOAD) : {
+			. = ALIGN(1048576);
+			__dma_buffer_start = .;
+			
+			*(.dma_buffer)
+			
+			. = ALIGN(1048576);
+			__dma_buffer_end = .;
+		} > __CORE1_RAM : __LOAD_RW
 
     .bss (NOLOAD) : {
         . = ALIGN(4);
@@ -190,7 +209,7 @@ SECTIONS {
         PROVIDE(end = .);  /* Used by newlib's syscalls */
         __end__ = .;       /* Used by newlib's semihosting */
         _end = .;
-    } > __CORE1_RAM : _LOAD_RW
+    } > __CORE1_RAM : __LOAD_RW
 
     .heap (NOLOAD) : {
         . = ALIGN(4);
@@ -202,7 +221,7 @@ SECTIONS {
         . = ALIGN(4);
         __heap_end = .;    /* User defined symbol */
         __heap_limit = .;  /* Used by newlib */
-    } > __CORE1_RAM : _LOAD_RW
+    } > __CORE1_RAM : __LOAD_RW
 
     .stack (NOLOAD) : {
         . = ALIGN(8);
@@ -234,7 +253,7 @@ SECTIONS {
         __stack = .;  /* Used by newlib */
         
         . = ALIGN(8);
-    } > __CORE1_RAM : _LOAD_RW
+    } > __CORE1_RAM : __LOAD_RW
 
     .ARM.attributes 0 : { KEEP(*(.ARM.attributes)) }
     /DISCARD/ : { *(.note.GNU-stack) }
