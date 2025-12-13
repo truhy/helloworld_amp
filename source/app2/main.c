@@ -21,10 +21,11 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20240505
+	Version: 20251205
 	Program: Hello, World! AMP for core 1
-	Target : ARM Cortex-A9 on the DE10-Nano dev board (Intel Cyclone V SoC FPGA)
-	Type   : Bare-metal C
+	Target : ARM Cortex-A9 on the DE10-Nano Kit development board (Altera
+	         Cyclone V SoC FPGA)
+	Type   : Stand-alone C application
 
 	About
 	=====
@@ -34,33 +35,30 @@
 	This example consists of two separate Eclipse IDE embedded C projects or two
 	applications, app1 and app2.
 
-	Each runs independently on one core of the Cortex-A9.  It is for the SoC
-	(aka HPS or CPU) part of the FPGA so it should work on other Cyclone V
-	SoC-FPGA dev boards, e.g.: DE1-SoC, DE-10 Standard, Arrow SoCKit, etc.
+	Each app executes independently on a separate Cortex-A9 core.
 
-	On a cold or warm reset, core 0 is in a running state and core 1 is kept in
-	the reset state.  App1 running on core 0 will release core 1 from reset.
-
-	Makes use of Intel/Altera HWLib bare-metal library for some of the low
-	level hardware access, and these are identified by their naming prefix
-	"alt_" or "ALT_".
-
-	HWLib's linker and startup code does not support the second core (core 1),
-	so included is my own GNU linker script and startup source files.
+	On a cold or warm reset, core 0 is in a running state but core 1 is kept in
+	the reset state.  App1 code will release core 1 from reset.
 
 	Limitations
 	===========
 
-	It seems the GDB & OpenOCD plugin for "Eclipse IDE for Embedded C/C++" does
+	It seems GDB & OpenOCD plugin for "Eclipse IDE for Embedded C/C++" does
 	not support AMP debugging, i.e. we cannot debug both cores at the same time
 	in a debug session.  We can only debug one core at a time.  If we debug on
 	core 0, breakpoints on the other core (core 1) are ignored, they are not
 	captured.  This is same for the opposite way.
 */
 
+// Trulib includes
 #include "tru_config.h"
-#include "tru_cortex_a9.h"
-#include "tru_c5soc_hps_uart_ll.h"
+#include "arm/tru_cortex_a9.h"
+
+// Arm CMSIS includes
+#include "RTE_Components.h"   // CMSIS
+#include CMSIS_device_header  // CMSIS
+
+// Standard includes
 #include <stdio.h>
 
 #ifdef SEMIHOSTING
