@@ -21,7 +21,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
-	Version: 20251205
+	Version: 20251223
 	Program: Hello, World! AMP for core 0
 	Target : ARM Cortex-A9 on the DE10-Nano Kit development board (Altera
 	         Cyclone V SoC FPGA)
@@ -52,6 +52,7 @@
 
 // Trulib includes
 #include "tru_config.h"
+#include "tru_iom.h"
 #include "arm/tru_cortex_a9.h"
 
 // Arm CMSIS includes
@@ -112,8 +113,8 @@ void release_core1(void){
 	//L1C_CleanDCacheAll();  // Required if L1 d-cache was enabled (i.e. in U-Boot), this is because core 0 loaded app2 into memory and it may be cached and dirty
 	//L2C_CleanInvAllByWay();  // Required if L2 cache was was enabled (i.e. in U-Boot), this is because core 0 loaded app2 into memory and it may be cached and dirty
 
-	uint32_t val = tru_iom_rd32((uint32_t *)0xffd05010) & 0xfffffffd;
-	tru_iom_wr32((uint32_t *)0xffd05010, val);
+	uint32_t val = iom_rd32((uint32_t *)0xffd05010) & 0xfffffffd;
+	iom_wr32((uint32_t *)0xffd05010, val);
 }
 
 int main(int argc, char **argv){
