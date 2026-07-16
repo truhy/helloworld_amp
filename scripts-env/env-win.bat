@@ -12,9 +12,9 @@ SET OPENOCD_PATH=C:\devtools\xpack-openocd-0.12.0-7\bin
 :: Application settings
 SET APP_HOME_PATH=%SCRIPT_PATH%
 SET APP_OUT_PATH=.
-SET APP_SRC_PATH1=source/app1
+SET APP_SRC_PATH1=source/hwamp_app1
 SET APP_PROGRAM_NAME1=hwamp_app1
-SET APP_SRC_PATH2=source/app2
+SET APP_SRC_PATH2=source/hwamp_app2
 SET APP_PROGRAM_NAME2=hwamp_app2
 
 :: Other stuff
